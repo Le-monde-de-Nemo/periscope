@@ -1,8 +1,9 @@
 module fr.eirb.lemondedenemo.periscope {
-    requires javafx.controls;
-    requires javafx.fxml;
+  requires javafx.controls;
+  requires javafx.fxml;
 
+  opens fr.eirb.lemondedenemo.periscope to
+      javafx.fxml;
 
-    opens fr.eirb.lemondedenemo.periscope to javafx.fxml;
-    exports fr.eirb.lemondedenemo.periscope;
+  exports fr.eirb.lemondedenemo.periscope;
 }
