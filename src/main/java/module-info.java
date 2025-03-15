@@ -6,4 +6,8 @@ module fr.eirb.lemondedenemo.periscope {
       javafx.fxml;
 
   exports fr.eirb.lemondedenemo.periscope;
+  exports fr.eirb.lemondedenemo.periscope.display;
+
+  opens fr.eirb.lemondedenemo.periscope.display to
+      javafx.fxml;
 }
