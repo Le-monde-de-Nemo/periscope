@@ -1,4 +1,4 @@
-package fr.eirb.lemondedenemo.periscope;
+package fr.eirb.lemondedenemo.periscope.display;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
