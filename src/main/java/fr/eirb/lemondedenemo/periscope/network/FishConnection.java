@@ -61,17 +61,6 @@ public class FishConnection implements Connection {
             });
     this.reader.setName("ConnectionReader");
     this.reader.start();
-
-    Runtime.getRuntime()
-        .addShutdownHook(
-            new Thread(
-                () -> {
-                  try {
-                    this.disconnect();
-                  } catch (IOException e) {
-                    this.logger.error("Cannot close connection.", e);
-                  }
-                }));
   }
 
   public boolean isConnected() {
@@ -106,7 +95,7 @@ public class FishConnection implements Connection {
           this.events.fireEvent(new PongReceiveEvent(Integer.parseInt(components[1])));
         } catch (NumberFormatException e) {
           this.logger.error(
-              "Invalid pong packet. Server may be corrupted, exiting to prevent next errors.", e);
+              "Invalid value for pong packet. Server may be corrupted, exiting to prevent next errors.", e);
           System.exit(1);
         }
       }
