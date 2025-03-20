@@ -4,13 +4,13 @@ import fr.eirb.lemondedenemo.periscope.api.Client;
 import fr.eirb.lemondedenemo.periscope.api.network.packets.HandShakeInitPacket;
 import fr.eirb.lemondedenemo.periscope.events.FishEventManager;
 import fr.eirb.lemondedenemo.periscope.network.FishConnection;
+import fr.eirb.lemondedenemo.periscope.network.FishPingRunner;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import fr.eirb.lemondedenemo.periscope.network.FishPingRunner;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
