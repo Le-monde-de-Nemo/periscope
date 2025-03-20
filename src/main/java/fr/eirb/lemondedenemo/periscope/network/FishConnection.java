@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Optional;
 import org.apache.logging.log4j.Logger;
@@ -93,9 +94,14 @@ public class FishConnection implements Connection {
           this.events.fireEvent(new PongReceiveEvent(Integer.parseInt(components[1])));
         } catch (NumberFormatException e) {
           this.logger.error(
-              "Invalid value for pong packet. Server may be corrupted, exiting to prevent next errors.", e);
+              "Invalid value for pong packet. Server may be corrupted, exiting to prevent next errors.",
+              e);
           System.exit(1);
         }
+      }
+      case "list" -> {
+        // TODO : parse fishes list
+        this.events.fireEvent(new FishesReceivedEvent(new ArrayList<>()));
       }
       case "bye" -> {
         this.events.fireEvent(new QuitAcknowledgedEvent());
