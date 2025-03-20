@@ -3,7 +3,7 @@ package fr.eirb.lemondedenemo.periscope.display;
 import fr.eirb.lemondedenemo.periscope.utils.Coords;
 import fr.eirb.lemondedenemo.periscope.utils.Fish;
 
-public interface FishTankDisplay {
+public interface TankDisplay {
 
   /** Start the display */
   void start();
