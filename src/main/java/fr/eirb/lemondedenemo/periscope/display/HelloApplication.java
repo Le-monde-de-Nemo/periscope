@@ -1,4 +1,4 @@
-package fr.eirb.lemondedenemo.periscope;
+package fr.eirb.lemondedenemo.periscope.display;
 
 import java.io.IOException;
 import javafx.application.Application;
@@ -8,7 +8,7 @@ import javafx.stage.Stage;
 
 public class HelloApplication extends Application {
 
-  public static void main(String[] args) {
+  public static void startDisplay(String[] args) {
     launch();
   }
 
