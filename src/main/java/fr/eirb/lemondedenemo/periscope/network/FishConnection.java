@@ -1,8 +1,6 @@
 package fr.eirb.lemondedenemo.periscope.network;
 
-import fr.eirb.lemondedenemo.periscope.api.events.ConnectionReady;
-import fr.eirb.lemondedenemo.periscope.api.events.HandShakeReceiveEvent;
-import fr.eirb.lemondedenemo.periscope.api.events.PongReceiveEvent;
+import fr.eirb.lemondedenemo.periscope.api.events.*;
 import fr.eirb.lemondedenemo.periscope.api.network.Connection;
 import fr.eirb.lemondedenemo.periscope.api.network.packets.Packet;
 import fr.eirb.lemondedenemo.periscope.events.FishEventManager;
@@ -98,6 +96,10 @@ public class FishConnection implements Connection {
               "Invalid value for pong packet. Server may be corrupted, exiting to prevent next errors.", e);
           System.exit(1);
         }
+      }
+      case "bye" -> {
+        this.events.fireEvent(new QuitAcknowledgedEvent());
+        System.exit(0);
       }
     }
   }
