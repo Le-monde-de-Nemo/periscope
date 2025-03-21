@@ -1,27 +1,25 @@
 package fr.eirb.lemondedenemo.periscope;
 
-import fr.eirb.lemondedenemo.periscope.display.HelloApplication;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.util.Properties;
+import fr.eirb.lemondedenemo.periscope.display.FishTankDisplay;
+import fr.eirb.lemondedenemo.periscope.utils.Coords;
+import fr.eirb.lemondedenemo.periscope.utils.Fish;
+import java.io.FileNotFoundException;
 
 public class Starter {
 
-  public static void main(String[] args) throws IOException {
-    File file = new File("affichage.cfg");
-    if (!file.exists()) {
-      InputStream stream = Starter.class.getResourceAsStream("/affichage.cfg");
-      if (stream == null) throw new NoSuchFileException("/affichage.cfg");
-      Files.copy(stream, file.toPath());
-    }
-    try (InputStream stream = Files.newInputStream(file.toPath())) {
-      Properties properties = new Properties();
-      properties.load(stream);
-      System.out.println(properties.get("controller-address"));
-      HelloApplication.startDisplay(args);
-    }
+  public static void main(String[] args) throws InterruptedException, FileNotFoundException {
+    FishTankDisplay tankDisplay = new FishTankDisplay();
+    tankDisplay.start();
+
+    tankDisplay.addFish("ok", new Fish(100, 100, "ndacremont.png"), new Coords(400, 400));
+    tankDisplay.addFish("ok2", new Fish(20, 20), new Coords(400, 400));
+    tankDisplay.addFish("ok3", new Fish(30, 30), new Coords(400, 400));
+
+    Thread.sleep(1000);
+    tankDisplay.moveFish("ok", new Coords(600, 600), 5000);
+    tankDisplay.moveFish("ok2", new Coords(400, 700), 5000);
+    tankDisplay.moveFish("ok3", new Coords(300, 700), 5000);
+    Thread.sleep(5000);
+    tankDisplay.moveFish("ok", new Coords(0, 0), 5000);
   }
 }

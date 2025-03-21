@@ -1,18 +1,23 @@
 package fr.eirb.lemondedenemo.periscope.display;
 
+import fr.eirb.lemondedenemo.periscope.utils.Config;
 import fr.eirb.lemondedenemo.periscope.utils.Coords;
 import fr.eirb.lemondedenemo.periscope.utils.Fish;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -57,13 +62,21 @@ public class FishTankDisplay extends Application implements TankDisplay {
   public void addFish(String id, Fish fish, Coords coords) {
     Platform.runLater(
         () -> {
-          FishItem rect = new FishItem(fish.length, fish.height, Color.RED);
-          getInstance().fishes.put(id, rect);
-          rect.setX(coords.x());
-          rect.setY(coords.y());
+          FishItem image;
+          try {
+            image = new FishItem(new Image(new FileInputStream(fish.imageFile)));
+          } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+          }
+
+          image.setX(coords.x());
+          image.setY(coords.y());
+          image.setFitHeight(fish.height);
+          image.setFitWidth(fish.length);
 
           Pane pane = (Pane) getInstance().primaryStage.getScene().getRoot();
-          pane.getChildren().add(rect);
+          pane.getChildren().add(image);
+          getInstance().fishes.put(id, image);
         });
   }
 
@@ -76,7 +89,7 @@ public class FishTankDisplay extends Application implements TankDisplay {
   public void removeFish(String id) {
     Platform.runLater(
         () -> {
-          Rectangle fishItem = getInstance().fishes.get(id);
+          FishItem fishItem = getInstance().fishes.get(id);
           if (fishItem == null) return;
 
           Pane pane = (Pane) getInstance().primaryStage.getScene().getRoot();
@@ -101,20 +114,16 @@ public class FishTankDisplay extends Application implements TankDisplay {
         });
   }
 
-  private static class FishItem extends Rectangle {
+  private static class FishItem extends ImageView {
 
     public FishItem() {}
 
-    public FishItem(double width, double height) {
-      super(width, height);
+    public FishItem(String url) {
+      super(url);
     }
 
-    public FishItem(double width, double height, Paint fill) {
-      super(width, height, fill);
-    }
-
-    public FishItem(double x, double y, double width, double height) {
-      super(x, y, width, height);
+    public FishItem(Image image) {
+      super(image);
     }
   }
 }
