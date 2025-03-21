@@ -4,7 +4,10 @@ import fr.eirb.lemondedenemo.periscope.api.events.*;
 import fr.eirb.lemondedenemo.periscope.api.network.Connection;
 import fr.eirb.lemondedenemo.periscope.api.network.packets.Packet;
 import fr.eirb.lemondedenemo.periscope.events.FishEventManager;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -49,10 +52,10 @@ public class FishConnection implements Connection {
         new Thread(
             () -> {
               try {
-                byte[] buffer = new byte[1024];
-                int read;
-                while ((read = this.socket.getInputStream().read(buffer)) != -1) {
-                  this.receive(new String(buffer, 0, read));
+                BufferedReader in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+                String line;
+                while ((line = in.readLine()) != null) {
+                  this.receive(line);
                 }
               } catch (IOException e) {
                 this.logger.error(e);
@@ -99,10 +102,12 @@ public class FishConnection implements Connection {
           System.exit(1);
         }
       }
-      case "list" -> {
-        // TODO : parse fishes list
-        this.events.fireEvent(new FishesReceivedEvent(new ArrayList<>()));
-      }
+      case "list" ->
+          // TODO : parse fishes list
+          this.events.fireEvent(new FishesReceivedEvent(new ArrayList<>()));
+      case "ok", "nok" ->
+          this.events.fireEvent(
+              new CommandResultReceiveEvent(components[0].equalsIgnoreCase("OK")));
       case "bye" -> {
         this.events.fireEvent(new QuitAcknowledgedEvent());
         System.exit(0);

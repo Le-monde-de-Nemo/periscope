@@ -1,5 +1,6 @@
 package fr.eirb.lemondedenemo.periscope.api;
 
+import fr.eirb.lemondedenemo.periscope.api.commands.manager.CommandManager;
 import fr.eirb.lemondedenemo.periscope.api.events.manager.EventManager;
 import fr.eirb.lemondedenemo.periscope.api.network.Connection;
 import org.apache.logging.log4j.Logger;
@@ -20,6 +21,13 @@ public interface Client {
    * @return the event manager
    */
   EventManager getEvents();
+
+  /**
+   * Gets the command manager.
+   *
+   * @return the command manager
+   */
+  CommandManager getCommands();
 
   /**
    * Gets the logger.

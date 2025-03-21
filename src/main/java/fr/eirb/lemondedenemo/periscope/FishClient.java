@@ -1,7 +1,9 @@
 package fr.eirb.lemondedenemo.periscope;
 
 import fr.eirb.lemondedenemo.periscope.api.Client;
+import fr.eirb.lemondedenemo.periscope.api.commands.manager.CommandManager;
 import fr.eirb.lemondedenemo.periscope.api.network.packets.HandShakeInitPacket;
+import fr.eirb.lemondedenemo.periscope.commands.FishCommandManager;
 import fr.eirb.lemondedenemo.periscope.events.FishEventManager;
 import fr.eirb.lemondedenemo.periscope.network.FishConnection;
 import fr.eirb.lemondedenemo.periscope.network.FishPingRunner;
@@ -20,6 +22,7 @@ public class FishClient implements Client {
   private final Logger logger;
   private final FishEventManager events;
   private final FishConnection connection;
+  private final FishCommandManager commands;
   private final ScheduledExecutorService executor;
 
   public FishClient(String address, int port) {
@@ -27,6 +30,7 @@ public class FishClient implements Client {
     this.logger.atLevel(Level.INFO);
     this.events = new FishEventManager(this.logger);
     this.connection = new FishConnection(this.logger, address, port, this.events);
+    this.commands = new FishCommandManager(this.events, this.connection);
     this.executor = Executors.newSingleThreadScheduledExecutor();
     Runtime.getRuntime()
         .addShutdownHook(
@@ -60,6 +64,11 @@ public class FishClient implements Client {
   @Override
   public FishEventManager getEvents() {
     return this.events;
+  }
+
+  @Override
+  public CommandManager getCommands() {
+    return this.commands;
   }
 
   @Override
