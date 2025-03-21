@@ -1,13 +1,11 @@
 package fr.eirb.lemondedenemo.periscope.display;
 
-import fr.eirb.lemondedenemo.periscope.utils.Config;
 import fr.eirb.lemondedenemo.periscope.utils.Coords;
 import fr.eirb.lemondedenemo.periscope.utils.Fish;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -33,11 +31,17 @@ public class FishTankDisplay extends Application implements TankDisplay {
 
   @Override
   public void start(Stage primaryStage) {
+    Parameters parameters = getParameters();
+    List<String> dimensions = parameters.getUnnamed();
     instance = this;
     this.primaryStage = primaryStage;
+    primaryStage.setResizable(false);
 
     Pane pane = new Pane();
-    Scene scene = new Scene(pane, 800, 800);
+    Scene scene =
+        new Scene(
+            pane, Double.parseDouble(dimensions.get(0)), Double.parseDouble(dimensions.get(1)));
+
     pane.setBackground(new Background(new BackgroundFill(Color.BLUE, null, null)));
 
     primaryStage.setTitle("Fish Tank");
@@ -46,8 +50,8 @@ public class FishTankDisplay extends Application implements TankDisplay {
   }
 
   @Override
-  public void start() {
-    new Thread(Application::launch).start();
+  public void start(double width, double height) {
+    new Thread(() -> launch(String.valueOf(width), String.valueOf(height))).start();
     // return only when the instance is created
     while (getInstance() == null) {
       try {

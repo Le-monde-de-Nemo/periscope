@@ -6,7 +6,7 @@ import fr.eirb.lemondedenemo.periscope.utils.Fish;
 public interface TankDisplay {
 
   /** Start the display */
-  void start();
+  void start(double width, double height);
 
   /** Stop the display */
   void stop();

@@ -9,7 +9,7 @@ public class Starter {
 
   public static void main(String[] args) throws InterruptedException, FileNotFoundException {
     FishTankDisplay tankDisplay = new FishTankDisplay();
-    tankDisplay.start();
+    tankDisplay.start(900, 500);
 
     tankDisplay.addFish("ok", new Fish(100, 100, "ndacremont.png"), new Coords(400, 400));
     tankDisplay.addFish("ok2", new Fish(20, 20), new Coords(400, 400));
