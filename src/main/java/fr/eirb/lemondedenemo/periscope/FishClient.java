@@ -4,6 +4,7 @@ import fr.eirb.lemondedenemo.periscope.api.Client;
 import fr.eirb.lemondedenemo.periscope.api.commands.manager.CommandManager;
 import fr.eirb.lemondedenemo.periscope.api.network.packets.HandShakeInitPacket;
 import fr.eirb.lemondedenemo.periscope.commands.FishCommandManager;
+import fr.eirb.lemondedenemo.periscope.commands.REPL;
 import fr.eirb.lemondedenemo.periscope.events.FishEventManager;
 import fr.eirb.lemondedenemo.periscope.network.FishConnection;
 import fr.eirb.lemondedenemo.periscope.network.FishPingRunner;
@@ -19,10 +20,16 @@ import org.apache.logging.log4j.Logger;
 
 public class FishClient implements Client {
 
+  public static void main(String... args) {
+    FishClient client = new FishClient("127.0.0.1", 5555);
+    client.start();
+  }
+
   private final Logger logger;
   private final FishEventManager events;
   private final FishConnection connection;
   private final FishCommandManager commands;
+  private final REPL repl;
   private final ScheduledExecutorService executor;
 
   public FishClient(String address, int port) {
@@ -31,11 +38,14 @@ public class FishClient implements Client {
     this.events = new FishEventManager(this.logger);
     this.connection = new FishConnection(this.logger, address, port, this.events);
     this.commands = new FishCommandManager(this.events, this.connection);
+    this.repl = new REPL(this.logger, this.commands);
     this.executor = Executors.newSingleThreadScheduledExecutor();
     Runtime.getRuntime()
         .addShutdownHook(
             new Thread(
                 () -> {
+                  if (!this.repl.isInterrupted())
+                    this.repl.interrupt();
                   this.executor.shutdownNow();
                   try {
                     this.connection.disconnect();
@@ -53,6 +63,7 @@ public class FishClient implements Client {
       return;
     }
     this.connection.send(new HandShakeInitPacket(Optional.of("N1")));
+    this.repl.start();
     this.executor.schedule(new FishPingRunner(this.logger, this.connection, this.events), 30, TimeUnit.MILLISECONDS);
   }
 
