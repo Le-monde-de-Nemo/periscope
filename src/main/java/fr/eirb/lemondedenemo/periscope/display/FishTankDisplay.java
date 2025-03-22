@@ -18,10 +18,13 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class FishTankDisplay extends Application implements TankDisplay {
 
   private static FishTankDisplay instance;
+  private static Logger logger;
   private final HashMap<String, FishItem> fishes = new HashMap<>();
   private Stage primaryStage;
 
@@ -31,10 +34,12 @@ public class FishTankDisplay extends Application implements TankDisplay {
 
   @Override
   public void start(Stage primaryStage) {
-    Parameters parameters = getParameters();
-    List<String> dimensions = parameters.getUnnamed();
     instance = this;
     this.primaryStage = primaryStage;
+    logger = LogManager.getLogger();
+    logger.info("Starting fish tank display");
+    Parameters parameters = getParameters();
+    List<String> dimensions = parameters.getUnnamed();
     primaryStage.setResizable(false);
 
     Pane pane = new Pane();
@@ -66,10 +71,12 @@ public class FishTankDisplay extends Application implements TankDisplay {
   public void addFish(String id, Fish fish, Coords coords) {
     Platform.runLater(
         () -> {
+          logger.info("Add fish " + id + " at coords x:" + coords.x() + " y:" + coords.y());
           FishItem image;
           try {
             image = new FishItem(new Image(new FileInputStream(fish.imageFile)));
           } catch (FileNotFoundException e) {
+            logger.warn("Fish asset not found");
             throw new RuntimeException(e);
           }
 
@@ -93,6 +100,7 @@ public class FishTankDisplay extends Application implements TankDisplay {
   public void removeFish(String id) {
     Platform.runLater(
         () -> {
+          logger.info("Remove fish " + id);
           FishItem fishItem = getInstance().fishes.get(id);
           if (fishItem == null) return;
 
@@ -108,6 +116,10 @@ public class FishTankDisplay extends Application implements TankDisplay {
           FishItem fishItem = getInstance().fishes.get(id);
           if (fishItem == null) return;
 
+          logger.info(
+              String.format(
+                  "Move fish %s from x:%s y:%s to x:%s y:%s in %s milliseconds",
+                  id, fishItem.getX(), fishItem.getY(), coords.x(), coords.y(), duration));
           TranslateTransition transition = new TranslateTransition();
           transition.setNode(fishItem);
           transition.setToX(coords.x() - fishItem.getX()); // Translation relative
