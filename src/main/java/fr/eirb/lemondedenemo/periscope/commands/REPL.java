@@ -6,6 +6,7 @@ import jline.console.ConsoleReader;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
@@ -37,13 +38,30 @@ public final class REPL extends Thread {
 
           logger.info("Console: " + line);
           String[] components = line.split(" ");
+          List<String> arguments = List.of(Arrays.copyOfRange(components, 1, components.length));
           switch (components[0].toLowerCase(Locale.ROOT)) {
             case "quit", "bye", "stop" -> {
               try {
-                CommandResult result = this.commands.execute(CommandManager.Command.EXIT, List.of()).get();
+                CommandResult result = this.commands.execute(CommandManager.Command.EXIT, arguments).get();
                 if (result.isSuccess()) {
                   this.logger.info(result.getMessage());
                   break loop;
+                } else {
+                  this.logger.warn(result.getMessage());
+                }
+              } catch (ExecutionException e) {
+                throw new RuntimeException(e);
+              }
+            }
+            case "addfish" -> {
+              try {
+                if (components.length < 3) {
+                  this.logger.warn("addFish nécessite deux arguments");
+                  continue;
+                }
+                CommandResult result = this.commands.execute(CommandManager.Command.ADD_FISH, arguments).get();
+                if (result.isSuccess()) {
+                  this.logger.info(result.getMessage());
                 } else {
                   this.logger.warn(result.getMessage());
                 }
@@ -57,7 +75,7 @@ public final class REPL extends Thread {
                   this.logger.warn("delFish nécessite un argument");
                   continue;
                 }
-                CommandResult result = this.commands.execute(CommandManager.Command.DELETE_FISH, List.of(components[1])).get();
+                CommandResult result = this.commands.execute(CommandManager.Command.DELETE_FISH, arguments).get();
                 if (result.isSuccess()) {
                   this.logger.info(result.getMessage());
                 } else {
@@ -73,7 +91,7 @@ public final class REPL extends Thread {
                   this.logger.warn("startFish nécessite un argument");
                   continue;
                 }
-                CommandResult result = this.commands.execute(CommandManager.Command.START_FISH, List.of(components[1])).get();
+                CommandResult result = this.commands.execute(CommandManager.Command.START_FISH, arguments).get();
                 if (result.isSuccess()) {
                   this.logger.info(result.getMessage());
                 } else {
