@@ -12,7 +12,6 @@ import fr.eirb.lemondedenemo.periscope.api.network.packets.DeleteFishPacket;
 import fr.eirb.lemondedenemo.periscope.api.network.packets.Packet;
 import fr.eirb.lemondedenemo.periscope.api.network.packets.StartFishPacket;
 import fr.eirb.lemondedenemo.periscope.utils.Pair;
-
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;

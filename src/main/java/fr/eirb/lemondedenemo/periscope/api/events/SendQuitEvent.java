@@ -7,13 +7,12 @@ public class SendQuitEvent implements Event, Cancellable {
 
   private boolean cancelled;
 
-  @Override
-  public void setCancelled(boolean cancelled) {
-    this.cancelled = cancelled;
-  }
-
   public boolean isCancelled() {
     return this.cancelled;
   }
 
+  @Override
+  public void setCancelled(boolean cancelled) {
+    this.cancelled = cancelled;
+  }
 }
