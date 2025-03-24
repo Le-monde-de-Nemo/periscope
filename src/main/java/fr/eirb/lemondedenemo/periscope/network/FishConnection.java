@@ -51,7 +51,8 @@ public class FishConnection implements Connection {
         new Thread(
             () -> {
               try {
-                BufferedReader in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+                BufferedReader in =
+                    new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
                 String line;
                 while ((line = in.readLine()) != null) {
                   this.receive(line);
@@ -74,7 +75,8 @@ public class FishConnection implements Connection {
       return;
     }
     if (!this.reader.isInterrupted()) this.reader.interrupt();
-    while (!this.reader.isInterrupted());
+    while (!this.reader.isInterrupted())
+      ;
     this.writer.close();
     this.socket.close();
     this.logger.info("Disconnected from server.");
@@ -97,7 +99,8 @@ public class FishConnection implements Connection {
           this.events.fireEvent(new PongReceiveEvent(Integer.parseInt(components[1])));
         } catch (NumberFormatException e) {
           this.logger.error(
-              "Invalid value for pong packet. Server may be corrupted, exiting to prevent next errors.",
+              "Invalid value for pong packet. Server may be corrupted, exiting to prevent next"
+                  + " errors.",
               e);
           System.exit(1);
         }

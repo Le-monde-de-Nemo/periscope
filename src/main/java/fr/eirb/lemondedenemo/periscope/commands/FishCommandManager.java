@@ -61,13 +61,18 @@ public class FishCommandManager implements CommandManager {
 
     @EventHandler
     public void onEvent(CommandResultReceiveEvent event) {
-      Pair<Command, CompletableFuture<CommandResult>> pair = FishCommandManager.this.futuresResult.pop();
-      String failureMessage = switch (pair.first()) {
-        case STATUS -> "This should not be printed!";
-        case ADD_FISH -> "modèle de mobilité non supporté";
-        case DELETE_FISH, START_FISH -> "Poisson inexistant";
-      };
-      pair.second().complete(new FishCommandResult(event.success(), (event.success() ? "OK : " : "NOK : ") + failureMessage));
+      Pair<Command, CompletableFuture<CommandResult>> pair =
+          FishCommandManager.this.futuresResult.pop();
+      String failureMessage =
+                switch (pair.first()) {
+                  case STATUS -> "This should not be printed!";
+                  case ADD_FISH -> "modèle de mobilité non supporté";
+                  case DELETE_FISH, START_FISH -> "Poisson inexistant";
+                };
+      pair.second()
+                .complete(
+                    new FishCommandResult(
+                        event.success(), (event.success() ? "OK : " : "NOK : ") + failureMessage));
     }
 
   }
