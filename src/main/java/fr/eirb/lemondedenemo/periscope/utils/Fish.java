@@ -5,9 +5,29 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class Fish {
-  public int length;
-  public int height;
-  public File imageFile;
+  private int length;
+  private int height;
+  private final File imageFile;
+  
+  public void setLength(int length) {
+    this.length = length;
+  }
+  
+  public int getLength() {
+    return this.length;
+  }
+  
+  public void setHeight(int height) {
+    this.height = height;
+  }
+  
+  public int getHeight() {
+    return this.length;
+  }
+  
+  public File getImageFile() {
+    return this.imageFile;
+  }
 
   public Fish(int length, int height, File imageFile) {
     this.length = length;
