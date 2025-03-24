@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -25,7 +26,8 @@ public class FishTankDisplay extends Application implements TankDisplay {
 
   private static FishTankDisplay instance;
   private static Logger logger;
-  private final HashMap<String, FishItem> fishes = new HashMap<>();
+
+  private final Map<String, FishItem> fishes = new HashMap<>();
   private Stage primaryStage;
 
   private static FishTankDisplay getInstance() {
@@ -74,7 +76,7 @@ public class FishTankDisplay extends Application implements TankDisplay {
           logger.info("Add fish " + id + " at coords x:" + coords.x() + " y:" + coords.y());
           FishItem image;
           try {
-            image = new FishItem(new Image(new FileInputStream(fish.imageFile)));
+            image = new FishItem(new Image(new FileInputStream(fish.getImageFile())));
           } catch (FileNotFoundException e) {
             logger.warn("Fish asset not found");
             throw new RuntimeException(e);
@@ -82,8 +84,8 @@ public class FishTankDisplay extends Application implements TankDisplay {
 
           image.setX(coords.x());
           image.setY(coords.y());
-          image.setFitHeight(fish.height);
-          image.setFitWidth(fish.length);
+          image.setFitHeight(fish.getHeight());
+          image.setFitWidth(fish.getLength());
 
           Pane pane = (Pane) getInstance().primaryStage.getScene().getRoot();
           pane.getChildren().add(image);
