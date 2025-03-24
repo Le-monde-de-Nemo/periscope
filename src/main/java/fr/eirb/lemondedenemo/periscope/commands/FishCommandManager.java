@@ -64,15 +64,15 @@ public class FishCommandManager implements CommandManager {
       Pair<Command, CompletableFuture<CommandResult>> pair =
           FishCommandManager.this.futuresResult.pop();
       String failureMessage =
-                switch (pair.first()) {
-                  case STATUS -> "This should not be printed!";
-                  case ADD_FISH -> "modèle de mobilité non supporté";
-                  case DELETE_FISH, START_FISH -> "Poisson inexistant";
-                };
+          switch (pair.first()) {
+            case STATUS -> "This should not be printed!";
+            case ADD_FISH -> "modèle de mobilité non supporté";
+            case DELETE_FISH, START_FISH -> "Poisson inexistant";
+          };
       pair.second()
-                .complete(
-                    new FishCommandResult(
-                        event.success(), (event.success() ? "OK : " : "NOK : ") + failureMessage));
+          .complete(
+              new FishCommandResult(
+                  event.success(), (event.success() ? "OK : " : "NOK : ") + failureMessage));
     }
 
   }
