@@ -74,6 +74,5 @@ public class FishCommandManager implements CommandManager {
               new FishCommandResult(
                   event.success(), (event.success() ? "OK : " : "NOK : ") + failureMessage));
     }
-
   }
 }
