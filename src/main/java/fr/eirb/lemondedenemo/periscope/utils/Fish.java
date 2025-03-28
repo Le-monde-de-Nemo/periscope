@@ -3,6 +3,7 @@ package fr.eirb.lemondedenemo.periscope.utils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import org.apache.logging.log4j.LogManager;
 
 public class Fish {
   private final File imageFile;
@@ -29,8 +30,13 @@ public class Fish {
     }
     File imageFile = new File(dataFolder + "/" + resourceName);
 
-    if (!imageFile.exists()) throw new FileNotFoundException(resourceName);
-    this.imageFile = imageFile;
+    if (!imageFile.exists()) {
+      LogManager.getLogger().warn("Ressource "+ resourceName + " not found, switch to default asset");
+      Fish defaultFish = new Fish(length, height);
+      this.imageFile = defaultFish.imageFile;
+    } else {
+      this.imageFile = imageFile;
+    }
     this.length = length;
     this.height = height;
   }

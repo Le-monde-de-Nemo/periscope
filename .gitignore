@@ -39,6 +39,8 @@ bin/
 .DS_Store
 
 affichage.cfg
-fishes/
+
 
 logs
+fishes
+!resources/fishes/
