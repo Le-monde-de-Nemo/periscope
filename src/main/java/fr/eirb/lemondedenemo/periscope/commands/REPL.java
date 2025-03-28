@@ -25,12 +25,14 @@ public final class REPL extends Thread {
 
   public void run() {
     try {
-      ConsoleReader reader = new ConsoleReader("Client rézo", System.in, System.out, null);
+      ConsoleReader reader = new ConsoleReader(System.in, System.out);
       String line;
       loop:
       while (true) {
         line = reader.readLine("\33[31m> \33[0m");
-        if (line == null) line = "stop";
+        if (line == null) {
+          line = "stop";
+        }
         if (line.isEmpty()) continue;
 
         logger.info("Console: " + line);
@@ -107,6 +109,8 @@ public final class REPL extends Thread {
       }
     } catch (IOException | InterruptedException exception) {
       exception.printStackTrace();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
   }
 }

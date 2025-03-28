@@ -26,12 +26,4 @@ public class EventManagerTest {
     manager.fireEvent(new HandShakeReceiveEvent(Optional.of("N1")));
     Assertions.assertEquals(0, handshake.called);
   }
-
-  @Test
-  public void test() {
-    FishClient client = new FishClient("127.0.0.1", 5555);
-    client.getEvents().addListener(new PongListener(client.getLogger()));
-    new Thread(client::start).start();
-    for (; ; ) {}
-  }
 }
