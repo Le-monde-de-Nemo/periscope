@@ -1,6 +1,5 @@
 package fr.eirb.lemondedenemo.periscope.events;
 
-import fr.eirb.lemondedenemo.periscope.FishClient;
 import fr.eirb.lemondedenemo.periscope.api.events.HandShakeReceiveEvent;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
