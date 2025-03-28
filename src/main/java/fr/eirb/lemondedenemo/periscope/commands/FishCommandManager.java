@@ -4,14 +4,12 @@ import fr.eirb.lemondedenemo.periscope.api.commands.manager.CommandManager;
 import fr.eirb.lemondedenemo.periscope.api.commands.manager.CommandResult;
 import fr.eirb.lemondedenemo.periscope.api.events.CommandResultReceiveEvent;
 import fr.eirb.lemondedenemo.periscope.api.events.SendQuitEvent;
-import fr.eirb.lemondedenemo.periscope.api.events.manager.Cancellable;
 import fr.eirb.lemondedenemo.periscope.api.events.manager.EventHandler;
 import fr.eirb.lemondedenemo.periscope.api.events.manager.EventManager;
 import fr.eirb.lemondedenemo.periscope.api.events.manager.Listener;
 import fr.eirb.lemondedenemo.periscope.api.network.Connection;
 import fr.eirb.lemondedenemo.periscope.api.network.packets.*;
 import fr.eirb.lemondedenemo.periscope.utils.Pair;
-
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,10 +37,8 @@ public class FishCommandManager implements CommandManager {
     if (command == Command.EXIT) {
       SendQuitEvent event = new SendQuitEvent();
       this.eventManager.fireEvent(event);
-      if (event.isCancelled())
-        future.complete(new FishCommandResult(false, "Send quit cancelled"));
-      else
-        future.complete(new FishCommandResult(true, "Send quit accepted"));
+      if (event.isCancelled()) future.complete(new FishCommandResult(false, "Send quit cancelled"));
+      else future.complete(new FishCommandResult(true, "Send quit accepted"));
       this.connection.send(new DisconnectingPacket());
       return future;
     }
@@ -74,14 +70,18 @@ public class FishCommandManager implements CommandManager {
 
     @EventHandler
     public void onEvent(CommandResultReceiveEvent event) {
-      Pair<Command, CompletableFuture<CommandResult>> pair = FishCommandManager.this.futuresResult.pop();
-      String failureMessage = switch (pair.first()) {
-        case STATUS, EXIT -> "This should not be printed!";
-        case ADD_FISH -> "modèle de mobilité non supporté";
-        case DELETE_FISH, START_FISH -> "Poisson inexistant";
-      };
-      pair.second().complete(new FishCommandResult(event.success(), (event.success() ? "OK : " : "NOK : ") + failureMessage));
+      Pair<Command, CompletableFuture<CommandResult>> pair =
+          FishCommandManager.this.futuresResult.pop();
+      String failureMessage =
+          switch (pair.first()) {
+            case STATUS, EXIT -> "This should not be printed!";
+            case ADD_FISH -> "modèle de mobilité non supporté";
+            case DELETE_FISH, START_FISH -> "Poisson inexistant";
+          };
+      pair.second()
+          .complete(
+              new FishCommandResult(
+                  event.success(), (event.success() ? "OK : " : "NOK : ") + failureMessage));
     }
-
   }
 }

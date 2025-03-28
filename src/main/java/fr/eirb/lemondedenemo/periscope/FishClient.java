@@ -13,17 +13,11 @@ import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class FishClient implements Client {
-
-  public static void main(String... args) {
-    FishClient client = new FishClient("127.0.0.1", 5555);
-    client.start();
-  }
 
   private final Logger logger;
   private final FishEventManager events;
@@ -44,8 +38,7 @@ public class FishClient implements Client {
         .addShutdownHook(
             new Thread(
                 () -> {
-                  if (!this.repl.isInterrupted())
-                    this.repl.interrupt();
+                  if (!this.repl.isInterrupted()) this.repl.interrupt();
                   this.executor.shutdownNow();
                   try {
                     this.connection.disconnect();
@@ -53,6 +46,11 @@ public class FishClient implements Client {
                     this.logger.error("Cannot close connection.", e);
                   }
                 }));
+  }
+
+  public static void main(String... args) {
+    FishClient client = new FishClient("127.0.0.1", 5555);
+    client.start();
   }
 
   public void start() {
@@ -64,7 +62,8 @@ public class FishClient implements Client {
     }
     this.connection.send(new HandShakeInitPacket(Optional.of("N1")));
     this.repl.start();
-    this.executor.schedule(new FishPingRunner(this.logger, this.connection, this.events), 30, TimeUnit.MILLISECONDS);
+    this.executor.schedule(
+        new FishPingRunner(this.logger, this.connection, this.events), 30, TimeUnit.MILLISECONDS);
   }
 
   @Override

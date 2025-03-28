@@ -4,7 +4,6 @@ import fr.eirb.lemondedenemo.periscope.api.events.*;
 import fr.eirb.lemondedenemo.periscope.api.network.Connection;
 import fr.eirb.lemondedenemo.periscope.api.network.packets.Packet;
 import fr.eirb.lemondedenemo.periscope.events.FishEventManager;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -52,7 +51,8 @@ public class FishConnection implements Connection {
         new Thread(
             () -> {
               try {
-                BufferedReader in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+                BufferedReader in =
+                    new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
                 String line;
                 while ((line = in.readLine()) != null) {
                   this.receive(line);

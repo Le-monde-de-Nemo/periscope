@@ -5,11 +5,10 @@ import fr.eirb.lemondedenemo.periscope.api.events.manager.EventManager;
 import fr.eirb.lemondedenemo.periscope.api.events.manager.Listener;
 import fr.eirb.lemondedenemo.periscope.api.network.Connection;
 import fr.eirb.lemondedenemo.periscope.api.network.packets.PingPacket;
-import org.apache.logging.log4j.Logger;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import org.apache.logging.log4j.Logger;
 
 public class FishPingRunner implements Runnable {
 
