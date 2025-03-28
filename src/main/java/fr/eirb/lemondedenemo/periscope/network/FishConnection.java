@@ -97,7 +97,8 @@ public class FishConnection implements Connection {
           this.events.fireEvent(new PongReceiveEvent(Integer.parseInt(components[1])));
         } catch (NumberFormatException e) {
           this.logger.error(
-              "Invalid value for pong packet. Server may be corrupted, exiting to prevent next errors.",
+              "Invalid value for pong packet. Server may be corrupted, exiting to prevent next"
+                  + " errors.",
               e);
           System.exit(1);
         }
