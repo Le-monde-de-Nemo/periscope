@@ -31,7 +31,8 @@ public class Fish {
     File imageFile = new File(dataFolder + "/" + resourceName);
 
     if (!imageFile.exists()) {
-      LogManager.getLogger().warn("Ressource "+ resourceName + " not found, switch to default asset");
+      LogManager.getLogger()
+          .warn("Ressource " + resourceName + " not found, switch to default asset");
       Fish defaultFish = new Fish(length, height);
       this.imageFile = defaultFish.imageFile;
     } else {
