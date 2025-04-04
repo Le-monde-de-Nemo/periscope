@@ -2,7 +2,6 @@ plugins {
     id 'java'
     id 'application'
     id 'org.openjfx.javafxplugin' version '0.0.13'
-    id 'org.beryx.jlink' version '2.25.0'
 }
 
 group 'fr.eirb.lemondedenemo'
@@ -11,7 +10,6 @@ version '1.0-SNAPSHOT'
 repositories {
     mavenCentral()
 }
-
 
 ext {
     junitVersion = '5.10.2'
@@ -40,20 +38,24 @@ dependencies {
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+    implementation group: 'jline', name: 'jline', version: '2.14.6'
 }
 
 test {
     useJUnitPlatform()
 }
 
-jlink {
-    imageZip = project.file("${buildDir}/distributions/app-${javafx.platform.classifier}.zip")
-    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
-    launcher {
-        name = 'app'
-    }
-}
 
-jlinkZip {
-    group = 'distribution'
+tasks {
+    jar {
+        manifest {
+            attributes(
+                    "Main-Class": "fr.eirb.lemondedenemo.periscope.FishClient"
+            )
+        }
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        from {
+            configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+        }
+    }
 }

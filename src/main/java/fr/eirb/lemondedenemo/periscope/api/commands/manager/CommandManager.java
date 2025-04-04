@@ -11,7 +11,8 @@ public interface CommandManager {
     STATUS("status"),
     ADD_FISH("addFish"),
     DELETE_FISH("delFish"),
-    START_FISH("startFish");
+    START_FISH("startFish"),
+    EXIT("log out");
 
     private final String name;
 
