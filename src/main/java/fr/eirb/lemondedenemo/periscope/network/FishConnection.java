@@ -1,15 +1,16 @@
 package fr.eirb.lemondedenemo.periscope.network;
 
-import fr.eirb.lemondedenemo.periscope.api.events.ConnectionReady;
-import fr.eirb.lemondedenemo.periscope.api.events.HandShakeReceiveEvent;
-import fr.eirb.lemondedenemo.periscope.api.events.PongReceiveEvent;
+import fr.eirb.lemondedenemo.periscope.api.events.*;
 import fr.eirb.lemondedenemo.periscope.api.network.Connection;
 import fr.eirb.lemondedenemo.periscope.api.network.packets.Packet;
 import fr.eirb.lemondedenemo.periscope.events.FishEventManager;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Optional;
 import org.apache.logging.log4j.Logger;
@@ -50,10 +51,11 @@ public class FishConnection implements Connection {
         new Thread(
             () -> {
               try {
-                byte[] buffer = new byte[1024];
-                int read;
-                while ((read = this.socket.getInputStream().read(buffer)) != -1) {
-                  this.receive(new String(buffer, 0, read));
+                BufferedReader in =
+                    new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+                String line;
+                while ((line = in.readLine()) != null) {
+                  this.receive(line);
                 }
               } catch (IOException e) {
                 this.logger.error(e);
@@ -61,17 +63,6 @@ public class FishConnection implements Connection {
             });
     this.reader.setName("ConnectionReader");
     this.reader.start();
-
-    Runtime.getRuntime()
-        .addShutdownHook(
-            new Thread(
-                () -> {
-                  try {
-                    this.disconnect();
-                  } catch (IOException e) {
-                    this.logger.error("Cannot close connection.", e);
-                  }
-                }));
   }
 
   public boolean isConnected() {
@@ -84,6 +75,8 @@ public class FishConnection implements Connection {
       return;
     }
     if (!this.reader.isInterrupted()) this.reader.interrupt();
+    while (!this.reader.isInterrupted())
+      ;
     this.writer.close();
     this.socket.close();
     this.logger.info("Disconnected from server.");
@@ -106,9 +99,21 @@ public class FishConnection implements Connection {
           this.events.fireEvent(new PongReceiveEvent(Integer.parseInt(components[1])));
         } catch (NumberFormatException e) {
           this.logger.error(
-              "Invalid pong packet. Server may be corrupted, exiting to prevent next errors.", e);
+              "Invalid value for pong packet. Server may be corrupted, exiting to prevent next"
+                  + " errors.",
+              e);
           System.exit(1);
         }
+      }
+      case "list" ->
+          // TODO : parse fishes list
+          this.events.fireEvent(new FishesReceivedEvent(new ArrayList<>()));
+      case "ok", "nok" ->
+          this.events.fireEvent(
+              new CommandResultReceiveEvent(components[0].equalsIgnoreCase("OK")));
+      case "bye" -> {
+        this.events.fireEvent(new QuitAcknowledgedEvent());
+        System.exit(0);
       }
     }
   }
