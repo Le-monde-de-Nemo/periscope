@@ -2,7 +2,7 @@ package fr.eirb.lemondedenemo.periscope.commands;
 
 import fr.eirb.lemondedenemo.periscope.api.commands.manager.CommandManager;
 import fr.eirb.lemondedenemo.periscope.api.commands.manager.CommandResult;
-import java.io.IOException;
+import java.io.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -14,10 +14,14 @@ public final class REPL extends Thread {
 
   private final Logger logger;
   private final CommandManager commands;
+  private final InputStream in;
+  private final OutputStream out;
 
-  public REPL(Logger logger, CommandManager commands) {
+  public REPL(Logger logger, CommandManager commands, InputStream in, OutputStream out) {
     this.logger = logger;
     this.commands = commands;
+    this.in = in;
+    this.out = out;
     this.setDaemon(true);
     this.setPriority(Thread.MAX_PRIORITY);
     this.setName("REPL");
@@ -25,7 +29,7 @@ public final class REPL extends Thread {
 
   public void run() {
     try {
-      ConsoleReader reader = new ConsoleReader(System.in, System.out);
+      ConsoleReader reader = new ConsoleReader(this.in, this.out);
       String line;
       loop:
       while (true) {
