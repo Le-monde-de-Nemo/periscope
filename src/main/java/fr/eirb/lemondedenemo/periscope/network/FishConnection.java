@@ -75,6 +75,8 @@ public class FishConnection implements Connection {
       return;
     }
     if (!this.reader.isInterrupted()) this.reader.interrupt();
+    while (!this.reader.isInterrupted())
+      ;
     this.writer.close();
     this.socket.close();
     this.logger.info("Disconnected from server.");

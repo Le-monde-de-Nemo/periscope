@@ -23,7 +23,7 @@ tasks.withType(JavaCompile) {
 }
 
 application {
-    mainClass = 'fr.eirb.lemondedenemo.periscope.HelloApplication'
+    mainClass = 'fr.eirb.lemondedenemo.periscope.Starter'
 }
 
 javafx {

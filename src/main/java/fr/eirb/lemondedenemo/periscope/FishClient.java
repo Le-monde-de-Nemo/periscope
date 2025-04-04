@@ -61,9 +61,11 @@ public class FishClient implements Client {
       return;
     }
     this.connection.send(new HandShakeInitPacket(Optional.of("N1")));
-    this.repl.start();
-    this.executor.schedule(
-        new FishPingRunner(this.logger, this.connection, this.events), 30, TimeUnit.MILLISECONDS);
+    this.executor.scheduleAtFixedRate(
+        new FishPingRunner(this.logger, this.connection, this.events),
+        0,
+        30,
+        TimeUnit.MILLISECONDS);
   }
 
   @Override

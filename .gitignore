@@ -38,4 +38,9 @@ bin/
 ### Mac OS ###
 .DS_Store
 
+affichage.cfg
+
+
 logs
+fishes
+!resources/fishes/

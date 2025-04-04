@@ -48,7 +48,7 @@ public class FishCommandManager implements CommandManager {
     }
     Packet packet =
         switch (command) {
-          case EXIT -> null;
+          case EXIT, STATUS -> null;
           case ADD_FISH ->
               arguments.size() < 2
                   ? null
