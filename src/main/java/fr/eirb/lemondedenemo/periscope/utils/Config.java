@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
 public class Config {
   private static Config instance;
   private final Properties properties;
-  private final Logger logger = LogManager.getLogger();
+  private final Logger logger = LogManager.getLogger(Config.class);
 
   private Config() throws IOException {
     File file = new File("affichage.cfg");

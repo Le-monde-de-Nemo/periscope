@@ -1,7 +1,6 @@
 package fr.eirb.lemondedenemo.periscope.utils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 
@@ -16,11 +15,11 @@ public class Fish {
     this.imageFile = imageFile;
   }
 
-  public Fish(int length, int height) throws FileNotFoundException {
+  public Fish(int length, int height) {
     this(length, height, "nemo.png");
   }
 
-  public Fish(int length, int height, String resourceName) throws FileNotFoundException {
+  public Fish(int length, int height, String resourceName) {
     // set default asset
     String dataFolder;
     try {
@@ -31,7 +30,7 @@ public class Fish {
     File imageFile = new File(dataFolder + "/" + resourceName);
 
     if (!imageFile.exists()) {
-      LogManager.getLogger()
+      LogManager.getLogger(Fish.class)
           .warn("Ressource " + resourceName + " not found, switch to default asset");
       Fish defaultFish = new Fish(length, height);
       this.imageFile = defaultFish.imageFile;
