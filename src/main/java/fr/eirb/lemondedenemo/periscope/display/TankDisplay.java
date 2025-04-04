@@ -1,7 +1,7 @@
 package fr.eirb.lemondedenemo.periscope.display;
 
+import fr.eirb.lemondedenemo.periscope.api.utils.Fish;
 import fr.eirb.lemondedenemo.periscope.utils.Coords;
-import fr.eirb.lemondedenemo.periscope.utils.Fish;
 
 public interface TankDisplay {
 

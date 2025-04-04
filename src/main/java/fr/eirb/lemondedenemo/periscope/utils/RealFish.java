@@ -1,25 +1,26 @@
 package fr.eirb.lemondedenemo.periscope.utils;
 
+import fr.eirb.lemondedenemo.periscope.api.utils.Fish;
 import java.io.File;
 import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 
-public class Fish {
+public class RealFish implements Fish {
   private final File imageFile;
   private int length;
   private int height;
 
-  public Fish(int length, int height, File imageFile) {
+  public RealFish(int length, int height, File imageFile) {
     this.length = length;
     this.height = height;
     this.imageFile = imageFile;
   }
 
-  public Fish(int length, int height) {
+  public RealFish(int length, int height) {
     this(length, height, "nemo.png");
   }
 
-  public Fish(int length, int height, String resourceName) {
+  public RealFish(int length, int height, String resourceName) {
     // set default asset
     String dataFolder;
     try {
@@ -32,7 +33,7 @@ public class Fish {
     if (!imageFile.exists()) {
       LogManager.getLogger(Fish.class)
           .warn("Ressource " + resourceName + " not found, switch to default asset");
-      Fish defaultFish = new Fish(length, height);
+      RealFish defaultFish = new RealFish(length, height);
       this.imageFile = defaultFish.imageFile;
     } else {
       this.imageFile = imageFile;
@@ -41,22 +42,27 @@ public class Fish {
     this.height = height;
   }
 
+  @Override
   public int getLength() {
     return this.length;
   }
 
+  @Override
   public void setLength(int length) {
     this.length = length;
   }
 
+  @Override
   public int getHeight() {
-    return this.length;
+    return this.height;
   }
 
+  @Override
   public void setHeight(int height) {
     this.height = height;
   }
 
+  @Override
   public File getImageFile() {
     return this.imageFile;
   }

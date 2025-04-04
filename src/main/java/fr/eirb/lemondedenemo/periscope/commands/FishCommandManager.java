@@ -9,14 +9,16 @@ import fr.eirb.lemondedenemo.periscope.api.events.manager.EventManager;
 import fr.eirb.lemondedenemo.periscope.api.events.manager.Listener;
 import fr.eirb.lemondedenemo.periscope.api.network.Connection;
 import fr.eirb.lemondedenemo.periscope.api.network.packets.*;
+import fr.eirb.lemondedenemo.periscope.api.utils.Fish;
+import fr.eirb.lemondedenemo.periscope.utils.Coords;
 import fr.eirb.lemondedenemo.periscope.utils.Pair;
+import fr.eirb.lemondedenemo.periscope.utils.RealFish;
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Matcher;
 
 public class FishCommandManager implements CommandManager {
-
   private final EventManager eventManager;
   private final Connection connection;
   private final Deque<Pair<Command, CompletableFuture<CommandResult>>> futuresResult;
@@ -25,12 +27,17 @@ public class FishCommandManager implements CommandManager {
     this.eventManager = eventManager;
     this.connection = connection;
     this.futuresResult = new LinkedList<>();
-    this.eventManager.addListener(new ResultInterpretor());
+    this.eventManager.addListener(new ResultInterpreter());
   }
 
   @Override
-  public CompletableFuture<CommandResult> execute(Command command, List<String> arguments) {
+  public CompletableFuture<CommandResult> execute(Command command, Matcher matcher) {
     CompletableFuture<CommandResult> future = new CompletableFuture<>();
+    matcher.reset();
+    if (!matcher.find()) {
+      future.complete(new FishCommandResult(false, "Illegal arguments"));
+      return future;
+    }
     if (command == Command.STATUS) {
       return future;
     }
@@ -42,31 +49,40 @@ public class FishCommandManager implements CommandManager {
       this.connection.send(new DisconnectingPacket());
       return future;
     }
-    if (arguments.isEmpty()) {
-      future.complete(new FishCommandResult(false, "Pas assez d'arguments"));
-      return future;
-    }
+
     Packet packet =
         switch (command) {
-          case EXIT, STATUS -> null;
-          case ADD_FISH ->
-              arguments.size() < 2
-                  ? null
-                  : new AddFishPacket(arguments.getFirst(), arguments.get(1));
-          case DELETE_FISH -> new DeleteFishPacket(arguments.getFirst());
-          case START_FISH -> new StartFishPacket(arguments.getFirst());
+          case DELETE_FISH -> {
+            String name = matcher.group("name");
+            yield new DeleteFishPacket(name);
+          }
+          case START_FISH -> {
+            String name = matcher.group("name");
+            yield new StartFishPacket(name);
+          }
+          case ADD_FISH -> {
+            String name = matcher.group("name");
+            Coords location =
+                new Coords(
+                    Integer.parseInt(matcher.group("fishX")),
+                    Integer.parseInt(matcher.group("fishY")));
+            Fish fish =
+                new RealFish(
+                    Integer.parseInt(matcher.group("fishLength")),
+                    Integer.parseInt(matcher.group("fishHeight")),
+                    name);
+            String method = matcher.group("method");
+
+            yield new AddFishPacket(name, fish, location, method);
+          }
           default -> throw new IllegalStateException("Unexpected value: " + command);
         };
-    if (packet == null) {
-      future.complete(new FishCommandResult(false, "Pas assez d'arguments"));
-      return future;
-    }
     this.futuresResult.addLast(new Pair<>(command, future));
     this.connection.send(packet);
     return future;
   }
 
-  public class ResultInterpretor implements Listener {
+  public class ResultInterpreter implements Listener {
 
     @EventHandler
     public void onEvent(CommandResultReceiveEvent event) {
@@ -81,7 +97,7 @@ public class FishCommandManager implements CommandManager {
       pair.second()
           .complete(
               new FishCommandResult(
-                  event.success(), (event.success() ? "OK : " : "NOK : ") + failureMessage));
+                  event.success(), (event.success() ? "OK : " : "NOK : " + failureMessage)));
     }
   }
 }

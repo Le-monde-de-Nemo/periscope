@@ -1,12 +1,11 @@
 package fr.eirb.lemondedenemo.periscope.commands;
 
 import fr.eirb.lemondedenemo.periscope.api.commands.manager.CommandManager;
+import fr.eirb.lemondedenemo.periscope.api.commands.manager.CommandManager.Command;
 import fr.eirb.lemondedenemo.periscope.api.commands.manager.CommandResult;
 import java.io.*;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.ExecutionException;
+import java.nio.charset.StandardCharsets;
+import java.util.regex.Matcher;
 import jline.console.ConsoleReader;
 import org.apache.logging.log4j.Logger;
 
@@ -40,76 +39,26 @@ public final class REPL extends Thread {
         if (line.isEmpty()) continue;
 
         logger.info("Console: " + line);
-        String[] components = line.split(" ");
-        List<String> arguments = List.of(Arrays.copyOfRange(components, 1, components.length));
-        switch (components[0].toLowerCase(Locale.ROOT)) {
-          case "quit", "bye", "stop" -> {
-            try {
-              CommandResult result =
-                  this.commands.execute(CommandManager.Command.EXIT, arguments).get();
-              if (result.isSuccess()) {
-                this.logger.info(result.getMessage());
-                break loop;
-              } else {
-                this.logger.warn(result.getMessage());
-              }
-            } catch (ExecutionException e) {
-              throw new RuntimeException(e);
-            }
+        Matcher matcher = null;
+        for (Command command : Command.values()) {
+          matcher = command.getPattern().matcher(line);
+          if (!matcher.find()) continue;
+
+          CommandResult result = this.commands.execute(command, matcher).get();
+          if (result.isSuccess()) {
+            this.logger.info(result.getMessage());
+            out.write((result.getMessage() + "\n").getBytes(StandardCharsets.UTF_8));
+            break loop;
+          } else {
+            out.write((result.getMessage() + "\n").getBytes(StandardCharsets.UTF_8));
+            this.logger.warn(result.getMessage());
           }
-          case "addfish" -> {
-            try {
-              if (components.length < 3) {
-                this.logger.warn("addFish nécessite deux arguments");
-                continue;
-              }
-              CommandResult result =
-                  this.commands.execute(CommandManager.Command.ADD_FISH, arguments).get();
-              if (result.isSuccess()) {
-                this.logger.info(result.getMessage());
-              } else {
-                this.logger.warn(result.getMessage());
-              }
-            } catch (ExecutionException e) {
-              throw new RuntimeException(e);
-            }
-          }
-          case "delfish" -> {
-            try {
-              if (components.length < 2) {
-                this.logger.warn("delFish nécessite un argument");
-                continue;
-              }
-              CommandResult result =
-                  this.commands.execute(CommandManager.Command.DELETE_FISH, arguments).get();
-              if (result.isSuccess()) {
-                this.logger.info(result.getMessage());
-              } else {
-                this.logger.warn(result.getMessage());
-              }
-            } catch (ExecutionException e) {
-              throw new RuntimeException(e);
-            }
-          }
-          case "startfish" -> {
-            try {
-              if (components.length < 2) {
-                this.logger.warn("startFish nécessite un argument");
-                continue;
-              }
-              CommandResult result =
-                  this.commands.execute(CommandManager.Command.START_FISH, arguments).get();
-              if (result.isSuccess()) {
-                this.logger.info(result.getMessage());
-              } else {
-                this.logger.warn(result.getMessage());
-              }
-            } catch (ExecutionException e) {
-              throw new RuntimeException(e);
-            }
-          }
-          default -> logger.warn("NOK : command inconnue.");
+          break;
         }
+
+        assert matcher != null;
+        if (!matcher.find())
+          out.write("NOK : command inconnue.\n".getBytes(StandardCharsets.UTF_8));
       }
     } catch (IOException | InterruptedException exception) {
       exception.printStackTrace();

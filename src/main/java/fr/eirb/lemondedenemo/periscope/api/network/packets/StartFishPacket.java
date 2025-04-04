@@ -4,6 +4,6 @@ public record StartFishPacket(String name) implements Packet {
 
   @Override
   public String serialize() {
-    return this.name;
+    return "startFish " + this.name;
   }
 }
