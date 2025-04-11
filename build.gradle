@@ -60,5 +60,9 @@ tasks {
     }
     run {
         standardInput = System.in
+        standardOutput = System.out
+        ignoreExitValue = true
+        logging.captureStandardOutput(LogLevel.ERROR)
+        logging.captureStandardError(LogLevel.ERROR)
     }
 }
