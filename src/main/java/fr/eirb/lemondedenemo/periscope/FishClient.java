@@ -2,9 +2,14 @@ package fr.eirb.lemondedenemo.periscope;
 
 import fr.eirb.lemondedenemo.periscope.api.Client;
 import fr.eirb.lemondedenemo.periscope.api.commands.manager.CommandManager;
+import fr.eirb.lemondedenemo.periscope.api.events.HandShakeReceiveEvent;
+import fr.eirb.lemondedenemo.periscope.api.events.manager.EventHandler;
+import fr.eirb.lemondedenemo.periscope.api.events.manager.Listener;
 import fr.eirb.lemondedenemo.periscope.api.network.packets.HandShakeInitPacket;
 import fr.eirb.lemondedenemo.periscope.commands.FishCommandManager;
 import fr.eirb.lemondedenemo.periscope.commands.REPL;
+import fr.eirb.lemondedenemo.periscope.display.FishTankDisplay;
+import fr.eirb.lemondedenemo.periscope.display.TankDisplay;
 import fr.eirb.lemondedenemo.periscope.events.FishEventManager;
 import fr.eirb.lemondedenemo.periscope.network.FishConnection;
 import fr.eirb.lemondedenemo.periscope.network.FishPingRunner;
@@ -25,6 +30,7 @@ public class FishClient implements Client {
   private final FishCommandManager commands;
   private final REPL repl;
   private final ScheduledExecutorService executor;
+  private final TankDisplay tankDisplay;
 
   public FishClient(String address, int port) {
     this.logger = LogManager.getLogger("Client Rézo");
@@ -34,6 +40,7 @@ public class FishClient implements Client {
     this.commands = new FishCommandManager(this.events, this.connection);
     this.repl = new REPL(this.logger, this.commands, System.in, System.out);
     this.executor = Executors.newSingleThreadScheduledExecutor();
+    this.tankDisplay = new FishTankDisplay();
     Runtime.getRuntime()
         .addShutdownHook(
             new Thread(
@@ -45,6 +52,8 @@ public class FishClient implements Client {
                   } catch (IOException e) {
                     this.logger.error("Cannot close connection.", e);
                   }
+
+                  this.tankDisplay.stop();
                 }));
   }
 
@@ -60,12 +69,9 @@ public class FishClient implements Client {
       this.logger.error(e);
       return;
     }
+
+    this.events.addListener(new HandshakeReceiver());
     this.connection.send(new HandShakeInitPacket(Optional.of("N1")));
-    this.executor.scheduleAtFixedRate(
-        new FishPingRunner(this.logger, this.connection, this.events),
-        0,
-        30,
-        TimeUnit.MILLISECONDS);
   }
 
   @Override
@@ -86,5 +92,32 @@ public class FishClient implements Client {
   @Override
   public Logger getLogger() {
     return this.logger;
+  }
+
+  public class HandshakeReceiver implements Listener {
+
+    @EventHandler
+    public void onHandshake(HandShakeReceiveEvent event) {
+      if (event.id().isEmpty()) {
+        logger.warn("Handshake received but no screen available");
+        try {
+          FishClient.this.connection.disconnect();
+        } catch (IOException e) {
+          logger.error("Cannot close connection", e);
+        }
+        return;
+      }
+
+      logger.info("Handshake received, start repl, PingRunner and display");
+      FishClient.this.repl.start();
+      FishClient.this.executor.scheduleAtFixedRate(
+          new FishPingRunner(
+              FishClient.this.logger, FishClient.this.connection, FishClient.this.events),
+          0,
+          30,
+          TimeUnit.SECONDS);
+      FishClient.this.events.removeListener(this);
+      FishClient.this.tankDisplay.start(400, 400);
+    }
   }
 }
