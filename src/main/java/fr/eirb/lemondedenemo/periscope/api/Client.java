@@ -8,6 +8,9 @@ import org.apache.logging.log4j.Logger;
 /** Represents a client. */
 public interface Client {
 
+  /** Start client */
+  void start();
+
   /**
    * Gets the connection.
    *

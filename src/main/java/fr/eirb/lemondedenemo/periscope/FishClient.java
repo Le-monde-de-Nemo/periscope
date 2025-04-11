@@ -57,11 +57,7 @@ public class FishClient implements Client {
                 }));
   }
 
-  public static void main(String... args) {
-    FishClient client = new FishClient("127.0.0.1", 5555);
-    client.start();
-  }
-
+  @Override
   public void start() {
     try {
       this.connection.connect();
