@@ -24,9 +24,8 @@ import org.apache.logging.log4j.Logger;
 
 public class FishTankDisplay extends Application implements TankDisplay {
 
+  private final static Logger logger = LogManager.getLogger(FishTankDisplay.class);
   private static FishTankDisplay instance;
-  private static Logger logger;
-
   private final Map<String, FishItem> fishes = new HashMap<>();
   private Stage primaryStage;
 
@@ -38,7 +37,6 @@ public class FishTankDisplay extends Application implements TankDisplay {
   public void start(Stage primaryStage) {
     instance = this;
     this.primaryStage = primaryStage;
-    logger = LogManager.getLogger();
     logger.info("Starting fish tank display");
     Parameters parameters = getParameters();
     List<String> dimensions = parameters.getUnnamed();
