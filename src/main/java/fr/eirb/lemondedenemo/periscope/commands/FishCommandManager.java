@@ -68,6 +68,7 @@ public class FishCommandManager implements CommandManager {
                     Integer.parseInt(matcher.group("fishY")));
             Fish fish =
                 new RealFish(
+                    name,
                     Integer.parseInt(matcher.group("fishLength")),
                     Integer.parseInt(matcher.group("fishHeight")),
                     name);

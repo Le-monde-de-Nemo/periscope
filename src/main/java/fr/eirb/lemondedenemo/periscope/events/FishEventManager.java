@@ -4,9 +4,9 @@ import fr.eirb.lemondedenemo.periscope.api.events.manager.Event;
 import fr.eirb.lemondedenemo.periscope.api.events.manager.EventHandler;
 import fr.eirb.lemondedenemo.periscope.api.events.manager.EventManager;
 import fr.eirb.lemondedenemo.periscope.api.events.manager.Listener;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.logging.log4j.Logger;
 
 public class FishEventManager implements EventManager {
@@ -16,7 +16,7 @@ public class FishEventManager implements EventManager {
 
   public FishEventManager(Logger logger) {
     this.logger = logger;
-    this.listeners = new ArrayList<>();
+    this.listeners = new CopyOnWriteArrayList<>();
   }
 
   @Override

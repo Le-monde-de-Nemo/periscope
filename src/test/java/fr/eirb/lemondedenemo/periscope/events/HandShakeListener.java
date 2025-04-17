@@ -11,7 +11,7 @@ public class HandShakeListener implements Listener {
 
   @EventHandler
   public void onHandShakeReceive(HandShakeReceiveEvent event) {
-    System.out.println("Connection accepted ? " + event.id().isPresent());
+    System.out.println("Connection accepted ? " + event.success());
     ++called;
   }
 

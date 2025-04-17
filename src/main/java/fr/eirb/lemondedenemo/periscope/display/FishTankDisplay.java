@@ -1,5 +1,6 @@
 package fr.eirb.lemondedenemo.periscope.display;
 
+import fr.eirb.lemondedenemo.periscope.api.display.TankDisplay;
 import fr.eirb.lemondedenemo.periscope.api.utils.Fish;
 import fr.eirb.lemondedenemo.periscope.utils.Coords;
 import java.io.FileInputStream;
@@ -24,7 +25,7 @@ import org.apache.logging.log4j.Logger;
 
 public class FishTankDisplay extends Application implements TankDisplay {
 
-  private final static Logger logger = LogManager.getLogger(FishTankDisplay.class);
+  private static final Logger logger = LogManager.getLogger(FishTankDisplay.class);
   private static FishTankDisplay instance;
   private final Map<String, FishItem> fishes = new HashMap<>();
   private Stage primaryStage;
@@ -35,9 +36,8 @@ public class FishTankDisplay extends Application implements TankDisplay {
 
   @Override
   public void start(Stage primaryStage) {
-    instance = this;
-    this.primaryStage = primaryStage;
     logger.info("Starting fish tank display");
+    this.primaryStage = primaryStage;
     Parameters parameters = getParameters();
     List<String> dimensions = parameters.getUnnamed();
     primaryStage.setResizable(false);
@@ -52,6 +52,7 @@ public class FishTankDisplay extends Application implements TankDisplay {
     primaryStage.setTitle("Fish Tank");
     primaryStage.setScene(scene);
     primaryStage.show();
+    instance = this;
   }
 
   @Override
@@ -68,10 +69,20 @@ public class FishTankDisplay extends Application implements TankDisplay {
   }
 
   @Override
+  public double getWidth() {
+    return getInstance().primaryStage.getWidth();
+  }
+
+  @Override
+  public double getHeight() {
+    return getInstance().primaryStage.getHeight();
+  }
+
+  @Override
   public void addFish(String id, Fish fish, Coords coords) {
     Platform.runLater(
         () -> {
-          logger.info("Add fish " + id + " at coords x:" + coords.x() + " y:" + coords.y());
+          logger.info("Add fish {} at coords x:{} y:{}", id, coords.x(), coords.y());
           FishItem image;
           try {
             image = new FishItem(new Image(new FileInputStream(fish.getImageFile())));
@@ -100,7 +111,7 @@ public class FishTankDisplay extends Application implements TankDisplay {
   public void removeFish(String id) {
     Platform.runLater(
         () -> {
-          logger.info("Remove fish " + id);
+          logger.info("Remove fish {}", id);
           FishItem fishItem = getInstance().fishes.get(id);
           if (fishItem == null) return;
 
@@ -110,21 +121,25 @@ public class FishTankDisplay extends Application implements TankDisplay {
   }
 
   @Override
-  public void moveFish(String id, Coords coords, int duration) {
+  public void moveFish(String id, Coords coords, double duration) {
     Platform.runLater(
         () -> {
           FishItem fishItem = getInstance().fishes.get(id);
           if (fishItem == null) return;
 
           logger.info(
-              String.format(
-                  "Move fish %s from x:%s y:%s to x:%s y:%s in %s milliseconds",
-                  id, fishItem.getX(), fishItem.getY(), coords.x(), coords.y(), duration));
+              "Move fish {} from x:{} y:{} to x:{} y:{} in {} seconds",
+              id,
+              fishItem.getX(),
+              fishItem.getY(),
+              coords.x(),
+              coords.y(),
+              duration);
           TranslateTransition transition = new TranslateTransition();
           transition.setNode(fishItem);
           transition.setToX(coords.x() - fishItem.getX()); // Translation relative
           transition.setToY(coords.y() - fishItem.getY());
-          transition.setDuration(Duration.millis(duration));
+          transition.setDuration(Duration.seconds(duration));
 
           transition.play();
         });

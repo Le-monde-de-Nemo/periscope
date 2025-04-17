@@ -53,7 +53,7 @@ public class FishNetworkParser implements NetworkParser {
 
       fishes.add(
           new FishDestination(
-              new RealFish(fishLength, fishHeight, fishId),
+              new RealFish(fishId, fishLength, fishHeight, fishId),
               new Coords(destinationX, destinationY),
               duration));
     }

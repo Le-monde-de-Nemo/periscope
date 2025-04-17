@@ -1,11 +1,6 @@
 package fr.eirb.lemondedenemo.periscope.utils;
 
-public record Coords(int x, int y) {
-
-  public Coords(int x, int y) {
-    this.x = x;
-    this.y = y;
-  }
+public record Coords(double x, double y) {
 
   public Coords add(Coords other) {
     return new Coords(x + other.x, y + other.y);
@@ -23,7 +18,7 @@ public record Coords(int x, int y) {
     return new Coords(x / factor, y / factor);
   }
 
-  public int distance(Coords other) {
+  public double distance(Coords other) {
     return Math.abs(x - other.x) + Math.abs(y - other.y);
   }
 }

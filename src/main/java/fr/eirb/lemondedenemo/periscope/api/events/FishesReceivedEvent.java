@@ -11,8 +11,8 @@ public record FishesReceivedEvent(List<FishDestination> fishes) implements Event
     @Override
     public String toString() {
       return String.format(
-          "New fish : %s; destination : x: %d y: %d; size: %dx%d; duration: %f",
-          fish.toString(),
+          "New fish : %s; destination : x: %.0f y: %.0f; size: %.0fx%.0f; duration: %.0f",
+          fish.getName(),
           destination.x(),
           destination.y(),
           fish.getLength(),

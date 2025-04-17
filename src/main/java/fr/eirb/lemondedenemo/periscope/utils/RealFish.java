@@ -7,20 +7,20 @@ import org.apache.logging.log4j.LogManager;
 
 public class RealFish implements Fish {
   private final File imageFile;
-  private int length;
-  private int height;
+  private final String name;
+  private double length;
+  private double height;
 
-  public RealFish(int length, int height, File imageFile) {
-    this.length = length;
-    this.height = height;
-    this.imageFile = imageFile;
+  public RealFish(String name, double length, double height, File imageFile) {
+    this(name, length, height, imageFile.getName());
   }
 
-  public RealFish(int length, int height) {
-    this(length, height, "nemo.png");
+  public RealFish(String name, double length, double height) {
+    this(name, length, height, "nemo.png");
   }
 
-  public RealFish(int length, int height, String resourceName) {
+  public RealFish(String name, double length, double height, String resourceName) {
+    this.name = name;
     // set default asset
     String dataFolder;
     try {
@@ -28,22 +28,27 @@ public class RealFish implements Fish {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    File imageFile = new File(dataFolder + "/" + resourceName);
+    File ressourceFile = new File(dataFolder, resourceName);
 
-    if (!imageFile.exists()) {
+    if (!ressourceFile.exists()) {
       LogManager.getLogger(Fish.class)
-          .warn("Ressource " + resourceName + " not found, switch to default asset");
-      RealFish defaultFish = new RealFish(length, height);
+          .warn("Ressource {} not found, switch to default asset", resourceName);
+      RealFish defaultFish = new RealFish(name, length, height);
       this.imageFile = defaultFish.imageFile;
     } else {
-      this.imageFile = imageFile;
+      this.imageFile = ressourceFile;
     }
     this.length = length;
     this.height = height;
   }
 
   @Override
-  public int getLength() {
+  public String getName() {
+    return this.name;
+  }
+
+  @Override
+  public double getLength() {
     return this.length;
   }
 
@@ -53,7 +58,7 @@ public class RealFish implements Fish {
   }
 
   @Override
-  public int getHeight() {
+  public double getHeight() {
     return this.height;
   }
 

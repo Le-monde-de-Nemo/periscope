@@ -3,12 +3,13 @@ package fr.eirb.lemondedenemo.periscope.api.utils;
 import java.io.File;
 
 public interface Fish {
+  String getName();
 
-  int getLength();
+  double getLength();
 
   void setLength(int length);
 
-  int getHeight();
+  double getHeight();
 
   void setHeight(int height);
 

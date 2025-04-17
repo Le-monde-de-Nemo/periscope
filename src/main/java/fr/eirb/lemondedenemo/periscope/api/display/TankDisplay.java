@@ -1,4 +1,4 @@
-package fr.eirb.lemondedenemo.periscope.display;
+package fr.eirb.lemondedenemo.periscope.api.display;
 
 import fr.eirb.lemondedenemo.periscope.api.utils.Fish;
 import fr.eirb.lemondedenemo.periscope.utils.Coords;
@@ -7,6 +7,12 @@ public interface TankDisplay {
 
   /** Start the display */
   void start(double width, double height);
+
+  /** Get tank width * */
+  double getWidth();
+
+  /** Get tank height * */
+  double getHeight();
 
   /** Stop the display */
   void stop();
@@ -34,5 +40,5 @@ public interface TankDisplay {
    * @param coords where the fish goes
    * @param duration duration of the transition
    */
-  void moveFish(String id, Coords coords, int duration);
+  void moveFish(String id, Coords coords, double duration);
 }
