@@ -26,6 +26,7 @@ public final class REPL extends Thread {
     this.setName("REPL");
   }
 
+  @Override
   public void run() {
     try {
       ConsoleReader reader = new ConsoleReader(this.in, this.out);
@@ -38,7 +39,7 @@ public final class REPL extends Thread {
         }
         if (line.isEmpty()) continue;
 
-        logger.info("Console: " + line);
+        logger.info("Console: {}", line);
         Matcher matcher = null;
         for (Command command : Command.values()) {
           matcher = command.getPattern().matcher(line);
@@ -60,10 +61,8 @@ public final class REPL extends Thread {
         if (!matcher.find())
           out.write("NOK : command inconnue.\n".getBytes(StandardCharsets.UTF_8));
       }
-    } catch (IOException | InterruptedException exception) {
-      exception.printStackTrace();
     } catch (Exception e) {
-      throw new RuntimeException(e);
+      logger.error(e);
     }
   }
 }
