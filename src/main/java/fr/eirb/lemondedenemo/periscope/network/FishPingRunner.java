@@ -1,5 +1,6 @@
 package fr.eirb.lemondedenemo.periscope.network;
 
+import fr.eirb.lemondedenemo.periscope.api.events.PongReceiveEvent;
 import fr.eirb.lemondedenemo.periscope.api.events.manager.EventHandler;
 import fr.eirb.lemondedenemo.periscope.api.events.manager.EventManager;
 import fr.eirb.lemondedenemo.periscope.api.events.manager.Listener;
@@ -27,7 +28,7 @@ public class FishPingRunner implements Runnable {
 
   @Override
   public void run() {
-    if (this.lastAcknowledgedTime.get().plus(5L, ChronoUnit.SECONDS).isBefore(Instant.now())) {
+    if (this.lastAcknowledgedTime.get().plus(50L, ChronoUnit.SECONDS).isBefore(Instant.now())) {
       this.logger.error("Last acknowledged ping was too long ago, server may be off.");
       System.exit(2);
       return;
@@ -38,7 +39,8 @@ public class FishPingRunner implements Runnable {
   public class PingReader implements Listener {
 
     @EventHandler
-    public void onPing(PingPacket ping) {
+    public void onPong(PongReceiveEvent pongReceiveEvent) {
+      logger.trace("Pong {} received", pongReceiveEvent.id());
       FishPingRunner.this.lastAcknowledgedTime.set(Instant.now());
     }
   }

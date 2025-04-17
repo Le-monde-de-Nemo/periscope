@@ -10,9 +10,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Locale;
-import java.util.Optional;
 import org.apache.logging.log4j.Logger;
 
 public class FishConnection implements Connection {
@@ -22,6 +19,7 @@ public class FishConnection implements Connection {
   private final Logger logger;
   private final FishEventManager events;
   private final InetSocketAddress address;
+  private final FishNetworkParser parser;
 
   private final Socket socket;
   private PrintWriter writer;
@@ -32,17 +30,14 @@ public class FishConnection implements Connection {
     this.events = events;
     this.address = new InetSocketAddress(address, port);
     this.socket = new Socket();
+    this.parser = new FishNetworkParser(events);
   }
 
   @Override
   public void connect() throws IOException {
     this.socket.connect(this.address, TIMEOUT);
     this.logger.info(
-        "Connected to server at "
-            + this.address.getHostName()
-            + ":"
-            + this.address.getPort()
-            + ".");
+        "Connected to server at {} : {}.", this.address.getHostName(), this.address.getPort());
     this.events.fireEvent(new ConnectionReady(this.address));
 
     // Create in out streams
@@ -86,36 +81,8 @@ public class FishConnection implements Connection {
     if (message.isEmpty()) {
       return;
     }
-    this.logger.debug("Received message: " + message);
-    String[] components = message.split(" ");
-    switch (components[0].toLowerCase(Locale.ROOT)) {
-      case "no", "greeting" ->
-          this.events.fireEvent(
-              new HandShakeReceiveEvent(
-                  Optional.ofNullable(
-                      components[0].equalsIgnoreCase("greeting") ? components[1] : null)));
-      case "pong" -> {
-        try {
-          this.events.fireEvent(new PongReceiveEvent(Integer.parseInt(components[1])));
-        } catch (NumberFormatException e) {
-          this.logger.error(
-              "Invalid value for pong packet. Server may be corrupted, exiting to prevent next"
-                  + " errors.",
-              e);
-          System.exit(1);
-        }
-      }
-      case "list" ->
-          // TODO : parse fishes list
-          this.events.fireEvent(new FishesReceivedEvent(new ArrayList<>()));
-      case "ok", "nok" ->
-          this.events.fireEvent(
-              new CommandResultReceiveEvent(components[0].equalsIgnoreCase("OK")));
-      case "bye" -> {
-        this.events.fireEvent(new QuitAcknowledgedEvent());
-        System.exit(0);
-      }
-    }
+    this.logger.debug("Received message: {}", message);
+    this.parser.parse(message);
   }
 
   @Override

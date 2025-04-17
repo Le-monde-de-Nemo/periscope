@@ -94,7 +94,7 @@ public class FishClient implements Client {
 
     @EventHandler
     public void onHandshake(HandShakeReceiveEvent event) {
-      if (event.id().isEmpty()) {
+      if (!event.success()) {
         logger.warn("Handshake received but no screen available");
         try {
           FishClient.this.connection.disconnect();
@@ -113,7 +113,7 @@ public class FishClient implements Client {
           30,
           TimeUnit.SECONDS);
       FishClient.this.events.removeListener(this);
-      FishClient.this.tankDisplay.start(400, 400);
+      FishClient.this.tankDisplay.start(event.width(), event.height());
     }
   }
 }
