@@ -33,12 +33,7 @@ public final class REPL extends Thread {
     try {
       ConsoleReader reader = new ConsoleReader(this.in, this.out);
       String line;
-      boolean check = true;
-      while (check) {
-        line = reader.readLine(INPUT_REPL);
-        if (line == null) {
-          line = "stop";
-        }
+      while ((line = reader.readLine(INPUT_REPL)) != null) {
         if (line.isEmpty()) continue;
 
         logger.info("Console: {}", line);
@@ -49,7 +44,6 @@ public final class REPL extends Thread {
 
           CommandResult result = this.commands.execute(command, matcher).get();
           out.write((OUTPUT_REPL + result.getMessage() + "\n").getBytes(StandardCharsets.UTF_8));
-          if (result.isSuccess() && command == Command.EXIT) check = false;
           break;
         }
 
@@ -58,6 +52,11 @@ public final class REPL extends Thread {
         if (!matcher.find())
           out.write((OUTPUT_REPL + "NOK : command inconnue.\n").getBytes(StandardCharsets.UTF_8));
       }
+
+      // Exit
+      CommandResult result =
+          this.commands.execute(Command.EXIT, Command.EXIT.getPattern().matcher("bye")).get();
+      out.write((OUTPUT_REPL + result.getMessage() + "\n").getBytes(StandardCharsets.UTF_8));
     } catch (Exception e) {
       logger.error(e);
     }
