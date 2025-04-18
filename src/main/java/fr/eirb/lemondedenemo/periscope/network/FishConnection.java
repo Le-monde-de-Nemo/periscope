@@ -87,7 +87,9 @@ public class FishConnection implements Connection {
 
   @Override
   public void send(Packet packet) {
-    this.writer.println(packet.serialize());
+    String serialized = packet.serialize();
+    logger.debug("Send {}", serialized);
+    this.writer.println(serialized);
     this.writer.flush();
   }
 }
