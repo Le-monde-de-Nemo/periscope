@@ -30,15 +30,11 @@ public class FishNetworkParser implements NetworkParser {
   /**
    * Parse the fish and the destination of the list
    *
-   * @param fishPattern pattern of a fish representation
    * @param fishesGroup string to parse
    * @return list of fishDestination
    */
   private static List<FishDestination> getFishDestinations(String fishesGroup) {
-
-    Pattern fishPattern =
-        Pattern.compile(
-            "\\[(?<id>\\w+) at (?<destX>\\d+)x(?<destY>\\d+),(?<fishLength>\\d+)x(?<fishHeight>\\d+),(?<duration>\\d+)\\]");
+    Pattern fishPattern = Pattern.compile(FISH_PATTERN);
     Matcher fishMatcher = fishPattern.matcher(fishesGroup);
 
     List<FishDestination> fishes = new ArrayList<>();
