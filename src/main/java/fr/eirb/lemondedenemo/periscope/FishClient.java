@@ -14,6 +14,7 @@ import fr.eirb.lemondedenemo.periscope.display.FishTankListener;
 import fr.eirb.lemondedenemo.periscope.events.FishEventManager;
 import fr.eirb.lemondedenemo.periscope.network.FishConnection;
 import fr.eirb.lemondedenemo.periscope.network.FishPingRunner;
+import fr.eirb.lemondedenemo.periscope.utils.Config;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.Executors;
@@ -26,6 +27,7 @@ import org.apache.logging.log4j.Logger;
 public class FishClient implements Client {
 
   private final Logger logger;
+  private final Config config;
   private final FishEventManager events;
   private final FishConnection connection;
   private final FishCommandManager commands;
@@ -37,6 +39,12 @@ public class FishClient implements Client {
   public FishClient(String address, int port) {
     this.logger = LogManager.getLogger("Client Rézo");
     this.logger.atLevel(Level.INFO);
+    try {
+      this.config = Config.getInstance();
+    } catch (IOException e) {
+      this.logger.error("Error while loading config", e);
+      throw new RuntimeException(e);
+    }
     this.events = new FishEventManager(this.logger);
     this.connection = new FishConnection(this.logger, address, port, this.events);
     this.commands = new FishCommandManager(this.events, this.connection);
@@ -77,7 +85,9 @@ public class FishClient implements Client {
     }
 
     this.events.addListener(new HandshakeReceiver());
-    this.connection.send(new HandShakeInitPacket(Optional.of("N1")));
+    Optional<String> id =
+        Optional.ofNullable(FishClient.this.config.getProperties().getProperty("id", null));
+    this.connection.send(new HandShakeInitPacket(id));
   }
 
   @Override
@@ -105,22 +115,30 @@ public class FishClient implements Client {
     @EventHandler
     public void onHandshake(HandShakeReceiveEvent event) {
       if (!event.success()) {
-        logger.warn("Handshake received but no screen available");
+        FishClient.this.logger.warn("Handshake received but no screen available");
         try {
           FishClient.this.connection.disconnect();
         } catch (IOException e) {
-          logger.error("Cannot close connection", e);
+          FishClient.this.logger.error("Cannot close connection", e);
         }
         return;
       }
 
-      logger.info("Handshake received, start repl, PingRunner and display");
+      FishClient.this.logger.info("Handshake received, start repl, PingRunner and display");
+      long timeout = 30;
+      try {
+        timeout =
+            Long.parseLong(
+                FishClient.this.config.getProperties().getProperty("display-timeout-value", "30"));
+      } catch (NumberFormatException e) {
+        FishClient.this.logger.warn("Invalid display timeout value", e);
+      }
       FishClient.this.repl.start();
       FishClient.this.executor.scheduleAtFixedRate(
           new FishPingRunner(
               FishClient.this.logger, FishClient.this.connection, FishClient.this.events),
           0,
-          30,
+          timeout,
           TimeUnit.SECONDS);
       FishClient.this.tankDisplay.start(event.width(), event.height());
       FishClient.this.events.addListener(FishClient.this.fishTankListener);
