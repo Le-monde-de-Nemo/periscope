@@ -9,7 +9,7 @@ public record AddFishPacket(String name, Fish fish, Coords location, String meth
   @Override
   public String serialize() {
     return String.format(
-        "addFish %s at %dx%d,%dx%d, %s",
+        "addFish %s at %.0fx%.0f,%.0fx%.0f, %s",
         name, location.x(), location.y(), fish.getLength(), fish.getHeight(), method);
   }
 }
