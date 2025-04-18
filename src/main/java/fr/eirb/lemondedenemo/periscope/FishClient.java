@@ -6,6 +6,7 @@ import fr.eirb.lemondedenemo.periscope.api.display.TankDisplay;
 import fr.eirb.lemondedenemo.periscope.api.events.HandShakeReceiveEvent;
 import fr.eirb.lemondedenemo.periscope.api.events.manager.EventHandler;
 import fr.eirb.lemondedenemo.periscope.api.events.manager.Listener;
+import fr.eirb.lemondedenemo.periscope.api.network.packets.GetContinouslyFishesPacket;
 import fr.eirb.lemondedenemo.periscope.api.network.packets.HandShakeInitPacket;
 import fr.eirb.lemondedenemo.periscope.commands.FishCommandManager;
 import fr.eirb.lemondedenemo.periscope.commands.REPL;
@@ -142,6 +143,9 @@ public class FishClient implements Client {
           TimeUnit.SECONDS);
       FishClient.this.tankDisplay.start(event.width(), event.height());
       FishClient.this.events.addListener(FishClient.this.fishTankListener);
+
+      FishClient.this.connection.send(new GetContinouslyFishesPacket());
+
       FishClient.this.events.removeListener(this);
     }
   }
