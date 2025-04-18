@@ -98,7 +98,7 @@ public class FishCommandManager implements CommandManager {
       pair.second()
           .complete(
               new FishCommandResult(
-                  event.success(), (event.success() ? "OK : " : "NOK : " + failureMessage)));
+                  event.success(), (event.success() ? "OK" : "NOK : " + failureMessage)));
     }
   }
 }

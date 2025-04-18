@@ -11,6 +11,8 @@ import org.apache.logging.log4j.Logger;
 
 public final class REPL extends Thread {
 
+  private static final String INPUT_REPL = "\33[31m> \33[0m";
+  private static final String OUTPUT_REPL = "\33[31m< \33[0m";
   private final Logger logger;
   private final CommandManager commands;
   private final InputStream in;
@@ -31,9 +33,9 @@ public final class REPL extends Thread {
     try {
       ConsoleReader reader = new ConsoleReader(this.in, this.out);
       String line;
-      loop:
-      while (true) {
-        line = reader.readLine("\33[31m> \33[0m");
+      boolean check = true;
+      while (check) {
+        line = reader.readLine(INPUT_REPL);
         if (line == null) {
           line = "stop";
         }
@@ -46,20 +48,15 @@ public final class REPL extends Thread {
           if (!matcher.find()) continue;
 
           CommandResult result = this.commands.execute(command, matcher).get();
-          if (result.isSuccess()) {
-            this.logger.info(result.getMessage());
-            out.write((result.getMessage() + "\n").getBytes(StandardCharsets.UTF_8));
-            break loop;
-          } else {
-            out.write((result.getMessage() + "\n").getBytes(StandardCharsets.UTF_8));
-            this.logger.warn(result.getMessage());
-          }
+          out.write((OUTPUT_REPL + result.getMessage() + "\n").getBytes(StandardCharsets.UTF_8));
+          if (result.isSuccess() && command == Command.EXIT) check = false;
           break;
         }
 
         assert matcher != null;
+        matcher.reset();
         if (!matcher.find())
-          out.write("NOK : command inconnue.\n".getBytes(StandardCharsets.UTF_8));
+          out.write((OUTPUT_REPL + "NOK : command inconnue.\n").getBytes(StandardCharsets.UTF_8));
       }
     } catch (Exception e) {
       logger.error(e);
