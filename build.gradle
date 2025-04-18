@@ -50,7 +50,7 @@ tasks {
     jar {
         manifest {
             attributes(
-                    "Main-Class": "fr.eirb.lemondedenemo.periscope.FishClient"
+                    "Main-Class": "fr.eirb.lemondedenemo.periscope.Starter"
             )
         }
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
