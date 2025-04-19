@@ -21,13 +21,17 @@ import java.util.regex.Matcher;
 public class FishCommandManager implements CommandManager {
   private final EventManager eventManager;
   private final Connection connection;
+  private final FishStatusCommandListener fishStatusCommandListener;
   private final Deque<Pair<Command, CompletableFuture<CommandResult>>> futuresResult;
 
   public FishCommandManager(EventManager eventManager, Connection connection) {
     this.eventManager = eventManager;
     this.connection = connection;
     this.futuresResult = new LinkedList<>();
+    this.fishStatusCommandListener = new FishStatusCommandListener();
+
     this.eventManager.addListener(new ResultInterpreter());
+    this.eventManager.addListener(this.fishStatusCommandListener);
   }
 
   @Override
@@ -39,6 +43,7 @@ public class FishCommandManager implements CommandManager {
       return future;
     }
     if (command == Command.STATUS) {
+      future.complete(fishStatusCommandListener.getStatus());
       return future;
     }
     if (command == Command.EXIT) {

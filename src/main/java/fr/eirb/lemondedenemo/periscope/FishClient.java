@@ -7,7 +7,7 @@ import fr.eirb.lemondedenemo.periscope.api.events.HandShakeReceiveEvent;
 import fr.eirb.lemondedenemo.periscope.api.events.QuitAcknowledgedEvent;
 import fr.eirb.lemondedenemo.periscope.api.events.manager.EventHandler;
 import fr.eirb.lemondedenemo.periscope.api.events.manager.Listener;
-import fr.eirb.lemondedenemo.periscope.api.network.packets.GetContinouslyFishesPacket;
+import fr.eirb.lemondedenemo.periscope.api.network.packets.GetOnceFishesPacket;
 import fr.eirb.lemondedenemo.periscope.api.network.packets.HandShakeInitPacket;
 import fr.eirb.lemondedenemo.periscope.commands.FishCommandManager;
 import fr.eirb.lemondedenemo.periscope.commands.REPL;
@@ -173,7 +173,9 @@ public class FishClient implements Client {
       FishClient.this.events.addListener(FishClient.this.fishTankListener);
 
       // Get fishes continuously
-      FishClient.this.connection.send(new GetContinouslyFishesPacket());
+      // FishClient.this.connection.send(new GetContinouslyFishesPacket());
+      FishClient.this.executor.scheduleAtFixedRate(
+          () -> FishClient.this.connection.send(new GetOnceFishesPacket()), 0, 5, TimeUnit.SECONDS);
 
       // Remove listener
       FishClient.this.events.removeListener(this);
