@@ -50,7 +50,7 @@ public class FishClient implements Client {
     this.events = new FishEventManager(this.logger);
     this.connection = new FishConnection(this.logger, address, port, this.events);
     this.commands = new FishCommandManager(this.events, this.connection);
-    this.repl = new REPL(this.logger, this.commands, System.in, System.out);
+    this.repl = new REPL(this.logger, this.commands, System.out);
     this.executor =
         Executors.newScheduledThreadPool(
             2,

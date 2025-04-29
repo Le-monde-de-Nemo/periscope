@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN">
+<Configuration packages="fr.eirb.lemondedenemo.periscope">
     <Appenders>
-        <Console name="console" target="SYSTEM_OUT">
-            <PatternLayout
-                    pattern="[%t] [%d{HH:mm:ss}]: %highlight{%-5level: %m%n%throwable}{FATAL=red, ERROR=red, WARN=blue, INFO=white, DEBUG=green, TRACE=blue}"/>
-        </Console>
+        <TerminalConsole name="console">
+            <PatternLayout pattern="%highlight{[%d{HH:mm:ss} %level]: %msg%n%xEx}" disableAnsi="${tca:disableAnsi}"/>
+        </TerminalConsole>
         <RollingRandomAccessFile name="File" fileName="logs/latest.log" filePattern="logs/%d{yyyy-MM-dd}-%i.log">
             <PatternLayout pattern="[%t] [%d{HH:mm:ss} %p]: %m%n"/>
             <Policies>

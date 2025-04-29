@@ -3,17 +3,19 @@ package fr.eirb.lemondedenemo.periscope.commands;
 import fr.eirb.lemondedenemo.periscope.api.commands.manager.CommandManager;
 import fr.eirb.lemondedenemo.periscope.api.commands.manager.CommandManager.Command;
 import fr.eirb.lemondedenemo.periscope.api.commands.manager.CommandResult;
-import java.io.*;
+import fr.eirb.lemondedenemo.periscope.utils.TerminalConsoleAppender;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
-import org.jline.reader.impl.completer.StringsCompleter;
+import org.jline.reader.UserInterruptException;
+import org.jline.reader.impl.history.DefaultHistory;
 import org.jline.terminal.Terminal;
-import org.jline.terminal.TerminalBuilder;
 
 public final class REPL extends Thread {
 
@@ -21,15 +23,13 @@ public final class REPL extends Thread {
   private static final String OUTPUT_REPL = "\33[31m< \033[0m";
   private final Logger logger;
   private final CommandManager commands;
-  private final InputStream in;
   private final OutputStream out;
   private LineReader reader;
   private Terminal terminal;
 
-  public REPL(Logger logger, CommandManager commands, InputStream in, OutputStream out) {
+  public REPL(Logger logger, CommandManager commands, OutputStream out) {
     this.logger = logger;
     this.commands = commands;
-    this.in = in;
     this.out = out;
     this.setDaemon(true);
     this.setPriority(Thread.MAX_PRIORITY);
@@ -41,15 +41,19 @@ public final class REPL extends Thread {
     try {
       CommandResult result =
           this.commands.execute(Command.EXIT, Command.EXIT.getPattern().matcher("bye")).get();
-      out.write((OUTPUT_REPL + result.getMessage() + "\n").getBytes(StandardCharsets.UTF_8));
+      this.out.write((OUTPUT_REPL + result.getMessage() + "\n").getBytes(StandardCharsets.UTF_8));
+      this.out.flush();
+      TerminalConsoleAppender.setReader(null);
     } catch (Exception e) {
       logger.error(e);
     }
   }
 
-  private void setupREPL() throws IOException {
-    this.terminal = TerminalBuilder.builder().system(false).streams(this.in, this.out).build();
-    this.reader = LineReaderBuilder.builder().terminal(terminal).build();
+  private void setupREPL() {
+    this.terminal = TerminalConsoleAppender.getTerminal();
+    this.reader =
+        LineReaderBuilder.builder().terminal(this.terminal).history(new DefaultHistory()).build();
+    TerminalConsoleAppender.setReader(this.reader);
   }
 
   private void readREPL() throws ExecutionException, InterruptedException {
@@ -61,11 +65,11 @@ public final class REPL extends Thread {
       Matcher matcher = null;
       for (Command command : Command.values()) {
         matcher = command.getPattern().matcher(line);
-        if (!matcher.find()) continue;
-
-        CommandResult result = this.commands.execute(command, matcher).get();
-        terminal.writer().println(OUTPUT_REPL + result.getMessage());
-        break;
+        if (matcher.find()) {
+          CommandResult result = this.commands.execute(command, matcher).get();
+          terminal.writer().println(OUTPUT_REPL + result.getMessage());
+          break;
+        }
       }
 
       assert matcher != null;
@@ -76,18 +80,24 @@ public final class REPL extends Thread {
 
   @Override
   public void run() {
-    try {
+    boolean continueRunning = true;
 
-      setupREPL();
+    setupREPL();
 
-      readREPL();
-
-      exitREPL();
-
-    } catch (EndOfFileException e) {
-      exitREPL();
-    } catch (Exception e) {
-      logger.error(e);
+    while (continueRunning) {
+      try {
+        readREPL();
+      } catch (UserInterruptException ignored) {
+        this.logger.log(Level.DEBUG, "REPL interrupted");
+      } catch (ExecutionException | InterruptedException e) {
+        continueRunning = false;
+        this.logger.log(Level.ERROR, "REPL execution error", e);
+      } catch (EndOfFileException e) {
+        continueRunning = false;
+        this.logger.log(Level.DEBUG, "REPL end of file", e);
+      }
     }
+
+    exitREPL();
   }
 }
