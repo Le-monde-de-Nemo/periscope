@@ -3,18 +3,21 @@ package fr.eirb.lemondedenemo.periscope.commands;
 import fr.eirb.lemondedenemo.periscope.api.commands.manager.CommandManager;
 import fr.eirb.lemondedenemo.periscope.api.commands.manager.CommandManager.Command;
 import fr.eirb.lemondedenemo.periscope.api.commands.manager.CommandResult;
+import fr.eirb.lemondedenemo.periscope.api.events.FishesReceivedEvent;
+import fr.eirb.lemondedenemo.periscope.api.events.manager.EventHandler;
+import fr.eirb.lemondedenemo.periscope.api.events.manager.EventManager;
+import fr.eirb.lemondedenemo.periscope.api.events.manager.Listener;
+import fr.eirb.lemondedenemo.periscope.api.utils.Fish;
 import fr.eirb.lemondedenemo.periscope.utils.TerminalConsoleAppender;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
-import org.jline.builtins.Completers;
-import org.jline.reader.EndOfFileException;
-import org.jline.reader.LineReader;
-import org.jline.reader.LineReaderBuilder;
-import org.jline.reader.UserInterruptException;
+import org.jline.reader.*;
 import org.jline.reader.impl.history.DefaultHistory;
 import org.jline.terminal.Terminal;
 
@@ -25,13 +28,16 @@ public final class REPL extends Thread {
   private final Logger logger;
   private final CommandManager commands;
   private final OutputStream out;
+  private final CacheFishesListener cacheFishesListener;
   private LineReader reader;
   private Terminal terminal;
 
-  public REPL(Logger logger, CommandManager commands, OutputStream out) {
+  public REPL(Logger logger, CommandManager commands, EventManager events, OutputStream out) {
     this.logger = logger;
     this.commands = commands;
     this.out = out;
+    this.cacheFishesListener = new CacheFishesListener();
+    events.addListener(this.cacheFishesListener);
     this.setDaemon(true);
     this.setPriority(Thread.MAX_PRIORITY);
     this.setName("REPL");
@@ -57,14 +63,7 @@ public final class REPL extends Thread {
             .terminal(this.terminal)
             .history(new DefaultHistory())
             .option(LineReader.Option.MENU_COMPLETE, true)
-            .completer(
-                new Completers.TreeCompleter(
-                    Completers.TreeCompleter.node("addFish"),
-                    Completers.TreeCompleter.node("startFish"),
-                    Completers.TreeCompleter.node("delFish"),
-                    Completers.TreeCompleter.node("status"),
-                    Completers.TreeCompleter.node("bye"),
-                    Completers.TreeCompleter.node("quit")))
+            .completer(this.cacheFishesListener)
             .build();
     TerminalConsoleAppender.setReader(this.reader);
   }
@@ -112,5 +111,46 @@ public final class REPL extends Thread {
     }
 
     exitREPL();
+  }
+
+  public static class CacheFishesListener implements Listener, Completer {
+
+    private static final List<String> COMMANDS =
+        List.of("addFish", "delFish", "startFish", "status", "bye", "quit");
+
+    private final List<FishesReceivedEvent.FishDestination> fishes;
+
+    CacheFishesListener() {
+      this.fishes = new CopyOnWriteArrayList<>();
+    }
+
+    @EventHandler
+    public void onFishesReceived(FishesReceivedEvent event) {
+      this.fishes.clear();
+      this.fishes.addAll(event.fishes());
+    }
+
+    @Override
+    public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
+      List<String> words = line.words();
+      int wordIndex = line.wordIndex();
+
+      if (wordIndex == 0) {
+        // Complete the command
+        COMMANDS.stream()
+            .filter(cmd -> cmd.startsWith(line.word()))
+            .forEach(cmd -> candidates.add(new Candidate(cmd)));
+      } else if (wordIndex == 1) {
+        String cmd = words.getFirst();
+        if (cmd.equals("delFish") || cmd.equals("startFish")) {
+          this.fishes.stream()
+              .filter(fish -> !cmd.equalsIgnoreCase("startFish") || fish.duration() == 0)
+              .map(FishesReceivedEvent.FishDestination::fish)
+              .map(Fish::getName)
+              .filter(name -> cmd.startsWith(words.getLast()))
+              .forEach(name -> candidates.add(new Candidate(name)));
+        }
+      }
+    }
   }
 }
