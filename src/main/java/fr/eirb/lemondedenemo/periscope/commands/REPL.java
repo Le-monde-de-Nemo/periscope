@@ -10,6 +10,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
+import org.jline.builtins.Completers;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
@@ -52,7 +53,19 @@ public final class REPL extends Thread {
   private void setupREPL() {
     this.terminal = TerminalConsoleAppender.getTerminal();
     this.reader =
-        LineReaderBuilder.builder().terminal(this.terminal).history(new DefaultHistory()).build();
+        LineReaderBuilder.builder()
+            .terminal(this.terminal)
+            .history(new DefaultHistory())
+            .option(LineReader.Option.MENU_COMPLETE, true)
+            .completer(
+                new Completers.TreeCompleter(
+                    Completers.TreeCompleter.node("addFish"),
+                    Completers.TreeCompleter.node("startFish"),
+                    Completers.TreeCompleter.node("delFish"),
+                    Completers.TreeCompleter.node("status"),
+                    Completers.TreeCompleter.node("bye"),
+                    Completers.TreeCompleter.node("quit")))
+            .build();
     TerminalConsoleAppender.setReader(this.reader);
   }
 
