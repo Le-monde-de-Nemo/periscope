@@ -148,7 +148,7 @@ public final class REPL extends Thread {
               .filter(fish -> !cmd.equalsIgnoreCase("startFish") || fish.duration() == 0)
               .map(FishesReceivedEvent.FishDestination::fish)
               .map(Fish::getName)
-              .filter(name -> cmd.startsWith(words.getLast()))
+              .filter(name -> name.startsWith(words.getLast()))
               .map(Candidate::new)
               .forEach(candidates::add);
         }
