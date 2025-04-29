@@ -139,7 +139,8 @@ public final class REPL extends Thread {
         // Complete the command
         COMMANDS.stream()
             .filter(cmd -> cmd.startsWith(line.word()))
-            .forEach(cmd -> candidates.add(new Candidate(cmd)));
+            .map(Candidate::new)
+            .forEach(candidates::add);
       } else if (wordIndex == 1) {
         String cmd = words.getFirst();
         if (cmd.equals("delFish") || cmd.equals("startFish")) {
@@ -148,7 +149,8 @@ public final class REPL extends Thread {
               .map(FishesReceivedEvent.FishDestination::fish)
               .map(Fish::getName)
               .filter(name -> cmd.startsWith(words.getLast()))
-              .forEach(name -> candidates.add(new Candidate(name)));
+              .map(Candidate::new)
+              .forEach(candidates::add);
         }
       }
     }
