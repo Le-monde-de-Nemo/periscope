@@ -92,7 +92,7 @@ public class FishTankDisplay extends Application implements TankDisplay {
           }
 
           image.setX(coords.x());
-          image.setY(coords.y());
+          image.setY(coords.y() - fish.getHeight());
           image.setFitHeight(fish.getHeight());
           image.setFitWidth(fish.getLength());
 
@@ -138,7 +138,7 @@ public class FishTankDisplay extends Application implements TankDisplay {
           TranslateTransition transition = new TranslateTransition();
           transition.setNode(fishItem);
           transition.setToX(coords.x() - fishItem.getX()); // Translation relative
-          transition.setToY(coords.y() - fishItem.getY());
+          transition.setToY(coords.y() - fishItem.getY() - fishItem.getFitHeight());
           transition.setDuration(Duration.seconds(duration));
 
           transition.play();
