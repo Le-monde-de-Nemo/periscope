@@ -11,9 +11,9 @@ public interface CommandManager {
   enum Command {
     STATUS("status"),
     ADD_FISH(
-        "addFish (?<name>[a-zA-Z]+) at (?<fishX>\\d+)x(?<fishY>\\d+), ?(?<fishLength>\\d+)x(?<fishHeight>\\d+), (?<method>[a-zA-Z]+)"),
-    DELETE_FISH("delFish (?<name>[a-zA-Z]+)"),
-    START_FISH("startFish (?<name>[a-zA-Z]+)"),
+        "addFish (?<name>[a-zA-Z0-9]+) at (?<fishX>\\d+)x(?<fishY>\\d+), ?(?<fishLength>\\d+)x(?<fishHeight>\\d+), (?<method>[a-zA-Z]+)"),
+    DELETE_FISH("delFish (?<name>[a-zA-Z0-9]+)"),
+    START_FISH("startFish (?<name>[a-zA-Z0-9]+)"),
     EXIT("(log out)|(bye)|(quit)|(stop)");
 
     private final Pattern pattern;
