@@ -11,6 +11,7 @@ import java.util.Map;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -18,7 +19,9 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,6 +32,8 @@ public class FishTankDisplay extends Application implements TankDisplay {
   private static FishTankDisplay instance;
   private final Map<String, FishItem> fishes = new HashMap<>();
   private Stage primaryStage;
+  private double xOffset = 0;
+  private double yOffset = 0;
 
   private static FishTankDisplay getInstance() {
     return instance;
@@ -47,11 +52,31 @@ public class FishTankDisplay extends Application implements TankDisplay {
         new Scene(
             pane, Double.parseDouble(dimensions.get(0)), Double.parseDouble(dimensions.get(1)));
 
+    primaryStage.setTitle(dimensions.get(2));
+    Text text = new Text(primaryStage.getTitle());
+    text.setX(10);
+    text.setY(10);
+    text.setFill(Color.WHITE);
+    pane.getChildren().add(text);
     pane.setBackground(new Background(new BackgroundFill(Color.BLUE, null, null)));
 
-    primaryStage.setTitle(dimensions.get(2));
+    primaryStage.initStyle(StageStyle.UNDECORATED);
     primaryStage.setScene(scene);
     primaryStage.show();
+
+    Parent root = primaryStage.getScene().getRoot();
+    root.setOnMousePressed(
+        event -> {
+          xOffset = event.getSceneX();
+          yOffset = event.getSceneY();
+        });
+
+    root.setOnMouseDragged(
+        event -> {
+          primaryStage.setX(event.getScreenX() - xOffset);
+          primaryStage.setY(event.getScreenY() - yOffset);
+        });
+
     instance = this;
   }
 
