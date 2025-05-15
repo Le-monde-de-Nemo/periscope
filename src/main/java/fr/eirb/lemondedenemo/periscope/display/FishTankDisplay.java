@@ -127,7 +127,7 @@ public class FishTankDisplay extends Application implements TankDisplay {
           FishItem fishItem = getInstance().fishes.get(id);
           if (fishItem == null) return;
 
-          logger.info(
+          logger.debug(
               "Move fish {} from x:{} y:{} to x:{} y:{} in {} seconds",
               id,
               fishItem.getX(),
@@ -139,7 +139,7 @@ public class FishTankDisplay extends Application implements TankDisplay {
           transition.setNode(fishItem);
           transition.setToX(coords.x() - fishItem.getX()); // Translation relative
           transition.setToY(coords.y() - fishItem.getY() - fishItem.getFitHeight());
-          transition.setDuration(Duration.seconds(duration));
+          transition.setDuration(Duration.millis(duration));
 
           transition.play();
         });
