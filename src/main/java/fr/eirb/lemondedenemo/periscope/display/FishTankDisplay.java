@@ -164,7 +164,7 @@ public class FishTankDisplay extends Application implements TankDisplay {
           transition.setNode(fishItem);
           transition.setToX(coords.x() - fishItem.getX()); // Translation relative
           transition.setToY(coords.y() - fishItem.getY() - fishItem.getFitHeight());
-          transition.setDuration(Duration.millis(duration));
+          transition.setDuration(Duration.seconds(duration));
 
           transition.play();
         });
