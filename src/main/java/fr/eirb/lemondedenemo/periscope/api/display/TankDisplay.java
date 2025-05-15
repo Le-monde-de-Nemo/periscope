@@ -6,7 +6,7 @@ import fr.eirb.lemondedenemo.periscope.utils.Coords;
 public interface TankDisplay {
 
   /** Start the display */
-  void start(double width, double height);
+  void start(double width, double height, String title);
 
   /** Get tank width * */
   double getWidth();

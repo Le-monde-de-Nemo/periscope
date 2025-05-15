@@ -49,15 +49,15 @@ public class FishTankDisplay extends Application implements TankDisplay {
 
     pane.setBackground(new Background(new BackgroundFill(Color.BLUE, null, null)));
 
-    primaryStage.setTitle("Fish Tank");
+    primaryStage.setTitle(dimensions.get(2));
     primaryStage.setScene(scene);
     primaryStage.show();
     instance = this;
   }
 
   @Override
-  public void start(double width, double height) {
-    new Thread(() -> launch(String.valueOf(width), String.valueOf(height))).start();
+  public void start(double width, double height, String title) {
+    new Thread(() -> launch(String.valueOf(width), String.valueOf(height), title)).start();
     // return only when the instance is created
     while (getInstance() == null) {
       try {

@@ -169,7 +169,8 @@ public class FishClient implements Client {
       startPingRunner();
 
       // Start Display
-      FishClient.this.tankDisplay.start(event.width(), event.height());
+      String title = "Fish Tank " + event.id() + " - " + event.vueX() + "x" + event.vueY();
+      FishClient.this.tankDisplay.start(event.width(), event.height(), title);
       FishClient.this.events.addListener(FishClient.this.fishTankListener);
 
       // Get fishes continuously
